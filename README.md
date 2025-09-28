@@ -8,12 +8,14 @@ The project demonstrates the basic design of a DBMS-like application using *obje
 
 ## 📂 Project Structur
 
+<pre>
 src/ 
 └── com/customiseddbms/ 
             ├── model/Employee.java          # Employee entity class 
             ├── dbms/EmployeeDBMS.java       # Core DBMS logic (CRUD operations) 
             ├── utility/DBMSUtils.java       # Utility methods (helper functions) 
             └── app/DBMSConsoleApp.java      # Entry point (console interface)
+</pre>
 
 ## 🚀 Features (Initial Version)
 
