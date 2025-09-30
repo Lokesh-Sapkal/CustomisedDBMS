@@ -1,13 +1,28 @@
-package app;
+package com.customiseddbms.app;
 
-import model.Employee;
-import utility.DBMSUtils;
-import dbms.EmployeeDBMS;
+import com.customiseddbms.model.Employee;
+import com.customiseddbms.utility.DBMSUtils;
+import com.customiseddbms.dbms.EmployeeDBMS;
 
 import java.util.*;
 
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+//	Class Name			:	DBMSConsoleApp
+//	Description			:	This class is an entry point of the application.
+//
+///////////////////////////////////////////////////////////////////////////////////////////
 public class DBMSConsoleApp
 {
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	main
+    //	Description             :   This is an entry point method that provides a parser-driven 
+    //                              console interface for interacting with the database.
+    //	Parameters				:   NONE
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
     public static void main(String A[])
     {
         String str = null;
@@ -99,8 +114,8 @@ public class DBMSConsoleApp
                 default :
                     System.out.println("Please give valid input.");
 
-            }   // End of switch
+            }   // End of switch case
 
-        }   // End of while
+        }   // End of while loop
     }   // End of main method
 } // End of main class
