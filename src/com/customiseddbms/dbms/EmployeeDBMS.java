@@ -4,16 +4,19 @@ import com.customiseddbms.model.Employee;
 import com.customiseddbms.utility.DBMSUtils;
 
 import java.util.*;
+import java.io.*;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
 //	Class Name			:	EmployeeDBMS
-//	Description			:	This class handles core functionalities (CRUD operations).
+//	Description			:	This class handles core functionalities (CRUD operations) and 
+//                          implements the Serializable interface.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
-public class EmployeeDBMS
+public class EmployeeDBMS implements Serializable
 {
     public LinkedList <Employee> Table;
+    private static final String FilePath = "data/backups/";
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -28,9 +31,8 @@ public class EmployeeDBMS
     {
         Table = new LinkedList <Employee> ();
         System.out.println("----------------------------------------------------------------------");
-        System.out.println("---------- Customised DBMS Application started succesfully. ----------");
+        System.out.println("---------- Customised DBMS Application started successfully. ----------");
     }
-
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -41,10 +43,10 @@ public class EmployeeDBMS
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
     public void InsertQuery(
-                                String name,        // Name of employee
-                                int age,            // Age of employee
-                                String address,     // Address of employee
-                                int salary          // Salary of employee
+                                String name,        //  Employee name
+                                int age,            //  Employee age
+                                String address,     //  Employee address
+                                int salary          //  Employee salary
                             )
     {
         Employee eobj = new Employee(name,age,address,salary);
@@ -54,7 +56,6 @@ public class EmployeeDBMS
         System.out.println("New Record inserted succesfully");
     }
 
-
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	SelectAll
@@ -63,13 +64,109 @@ public class EmployeeDBMS
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    public void SelectAll()
+    public void SelectAllFields()
     {
-        DBMSUtils.TableHeader();
+        DBMSUtils.DisplayAllTableHeaders();
 
         for(Employee eref : Table)
         {
             DBMSUtils.DisplayAllFields(eref);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	SelectOneField
+    //	Description             :   This method display specific employee records from the database.
+    //	Parameters				:   String(displayMode)
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    public void SelectSpecificField(
+                                        String displayMode    // Define the field to print
+                                    )
+    {
+        DBMSUtils.DisplaySpecificTableHeader(displayMode);
+
+        for(Employee eref : Table)
+        {
+            DBMSUtils.DisplaySpecificField(eref, displayMode);
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	TakeBackup
+    //	Description             :   This method stores/write an object of the EmployeeDBMS class in a file.
+    //	Parameters				:   String(fName)
+    //	Returns					:   NONE
+    //
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void TakeBackup(
+                                String fName    // File name
+                            )
+    {
+        try
+        {
+            File dir = new File(FilePath);
+            if(!dir.exists())
+            {
+                dir.mkdirs();
+            }
+
+            String fPath = FilePath+fName;
+            
+            FileOutputStream fos = new FileOutputStream(fPath);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(this);
+
+            oos.close();
+            fos.close();
+            
+            System.out.println("The class object could be written to a file.");
+        }
+        catch(Exception eobj)
+        {
+            System.out.println("The class object could not be written to the file.");
+            System.out.println("Error : "+eobj);
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	RestoreBackup
+    //	Description             :   This method reads an object of the EmployeeDBMS class from the file.
+    //	Parameters				:   String(fName)
+    //	Returns					:   EmployeeDBMS(object)
+    //
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static EmployeeDBMS RestoreBackup(
+                                                String fName    // File name
+                                            )
+    {
+        try
+        {
+            String fPath = FilePath+fName;
+            EmployeeDBMS empobj = null;
+            
+            FileInputStream fis = new FileInputStream(fPath);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            empobj = (EmployeeDBMS) ois.readObject();
+            
+            System.out.println("----------------------------------------------------------------------");
+            System.out.printf("--- Database restored successfully from %s file. ---\n",fName);
+
+            ois.close();
+            fis.close();
+            
+            return empobj;
+        }
+        catch(Exception eobj)
+        {
+            System.out.println("Failed to restore backup from "+fName);
+            return null;
         }
     }
 }

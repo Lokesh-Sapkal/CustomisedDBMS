@@ -19,7 +19,7 @@ public class DBMSConsoleApp
     //	Method Name			    :	main
     //	Description             :   This is an entry point method that provides a parser-driven 
     //                              console interface for interacting with the database.
-    //	Parameters				:   NONE
+    //	Parameters				:   String[0](FileName)
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -27,8 +27,34 @@ public class DBMSConsoleApp
     {
         String str = null;
         boolean exitloop = true;
+        String FileName = "employeeDB.ser";
 
-        EmployeeDBMS eobj = new EmployeeDBMS();
+        if(A.length != 0)
+        {
+            FileName = A[0];
+        }
+
+        EmployeeDBMS eobj = EmployeeDBMS.RestoreBackup(FileName);
+        
+        if(eobj == null)
+        {
+            eobj = new EmployeeDBMS();
+        }
+        else
+        {
+            int iMax = 0;
+
+            for(Employee eref : eobj.Table)
+            {
+                if(iMax < eref.EmpID)
+                {
+                    iMax = eref.EmpID;
+                }
+
+                Employee.iCounter = ++iMax;
+            }
+        }
+
         Scanner sobj = new Scanner(System.in);
 
         System.out.println("----------------------------------------------------------------------");
@@ -101,9 +127,34 @@ public class DBMSConsoleApp
                     break;
 
                 case "select":
-                    if((tokens[1].equals("*")) && (tokens.length == 4))
+                    if((tokens.length == 4) && (tokens[2].equalsIgnoreCase("from")) && (tokens[3].equalsIgnoreCase("Employee")))
                     {
-                        eobj.SelectAll();
+                        String Field = (tokens[1]).toLowerCase();
+
+                        if(Field.equals("*"))
+                        {
+                            eobj.SelectAllFields();
+                        }
+                        else if(DBMSUtils.IsValidField(Field))
+                        {
+                            
+                            eobj.SelectSpecificField(Field);
+                        }
+                        else
+                        {
+                            DBMSUtils.InvalidCommand();
+                        }
+                    }
+                    else
+                    {
+                        DBMSUtils.InvalidCommand();
+                    }
+                    break;
+
+                case "takebackup":
+                    if((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee")))
+                    {
+                        eobj.TakeBackup(FileName);
                     }
                     else
                     {

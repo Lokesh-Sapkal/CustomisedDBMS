@@ -1,12 +1,15 @@
 package com.customiseddbms.model;
 
+import java.io.*;
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
 //	Class Name			:	Employee
-//	Description			:	This class represents an employee entity.
+//	Description			:	This class represents an employee entity and implements the
+//                          Serializable interface.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
-public class Employee
+public class Employee implements Serializable
 {
     public int EmpID;
     public String EmpName;
@@ -31,10 +34,10 @@ public class Employee
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
     public Employee(
-                        String name,        // Name of employee
-                        int age,            // Age of employee
-                        String address,     // Address of employee
-                        int salary          // Salary of employee
+                        String name,        //  Employee name
+                        int age,            //  Employee age
+                        String address,     //  Employee address
+                        int salary          //  Employee salary
                     )
     {
         this.EmpID = iCounter++;
