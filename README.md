@@ -1,37 +1,45 @@
 # CustomisedDBMS
-A Customised DBMS implemented in Java with serialization support.
 
-# Customised Employee Database Management System (DBMS)
-
-A simple console-based Employee Database Management System built in Java.  
-The project demonstrates the basic design of a DBMS-like application using *object-oriented principles* and a clean *modular structure*.
+A Java-based console application simulating a simple Database Management System (DBMS) using LinkedList as the storage.  
+Supports employee record management,  Backup & Restore, and selective SELECT queries.
 
 ---
 
-## 📂 Project Structur
+## Overview
+
+CustomisedDBMS allows users to manage Employee records with the ability to:  
+- Insert new employee records  
+- Display all or specific fields using SELECT queries  
+- Backup current database state to a file
+- Restore database from a previous backup    
+
+It is fully console-driven, using a parser-like command interface.
+
+---
+
+## 📂 Project Structure
 ```bash
 src/ 
 └── com/customiseddbms/ 
-            ├── model/Employee.java          # Employee entity class 
-            ├── dbms/EmployeeDBMS.java       # Core DBMS logic (CRUD operations) 
-            ├── utility/DBMSUtils.java       # Utility methods (helper functions) 
-            └── app/DBMSConsoleApp.java      # Entry point (console interface)
+|            ├── model/Employee.java          # Employee entity class 
+|            ├── dbms/EmployeeDBMS.java       # Core DBMS logic (CRUD operations) 
+|            ├── utility/DBMSUtils.java       # Utility methods (helper functions) 
+|            └── app/DBMSConsoleApp.java      # Entry point (console interface)
+|
+└── data/backups/
+             └── employeeDB.ser               # Backup file location
 ```
----
-
-## 🚀 Features (Initial Version)
-
-- Add employee records  
-- Display all employee records  
-- Console-driven command interface
-- Modular package design (model, dbms, utility, app)
 
 ---
 
-## 🖥 Tech Stack
+## 🚀 Features
 
-- Java (OOP-based design)  
-- Console-based user interface  
+- Insert new employee records  
+- SELECT * or SELECT <field> queries (empid, empname, empage, empaddress, empsalary)  
+- Backup database to file  
+- Restore database from backup  
+- Describe schema command (describe Employee)  
+- Console-based table output with field validation  
 
 ---
 
@@ -43,44 +51,55 @@ cd src
 ```
 2. Compile the project:
 ```bash
-javac com/customiseddbms/app/DBMSConsoleApp.java 
-      com/customiseddbms/dbms/EmployeeDBMS.java 
-      com/customiseddbms/utility/DBMSUtils.java 
-      com/customiseddbms/model/Employee.java
+javac com/customiseddbms/app/DBMSConsoleApp.java
 ```
 3. Run the application:
 ```bash
-java com/customiseddbms/app/DBMSConsoleApp
+java com/customiseddbms/app/DBMSConsoleApp [backupFileName.ser]
 ```
+Default backup file: data/backups/employeeDB.ser if no filename is provided.
+
+---
+
+## Usage & Commands
+
+Describe Schema:
+```bash
+describe Employee
+```
+
+Insert Employee:
+```bash
+insert into Employee Values <Name> <Age> <Address> <Salary>
+```
+
+Select All Fields:
+```bash
+select * from Employee
+```
+
+Select Specific Field:
+```bash
+select <empid|empname|empage|empaddress|empsalary> from Employee
+```
+
+Backup Database:
+```bash
+takebackup Employee
+```
+
+Exit Application:
+```bash
+exit Employee
+```
+
 ---
 
 ## 📌 Future Enhancements
 
-- Implement serialization for persistent storage
-- Add search, update, and delete operations
+- Add update and delete operations
 - Extend parser for SQL-like commands
 
----
-
-## 💻 Sample Usage
-```bash
-----------------------------------------------------------------------
----------- Customised DBMS Application started succesfully. ----------
-----------------------------------------------------------------------
---------------- Welcome to Customised DBMS Application ---------------
-----------------------------------------------------------------------
-Employee DB > insert into employee values Mohan 25 Pune 50000
-Employee DB > select * from employee
-+----+-------+-----+----------+--------+
-| ID | Name  | Age | Address  | Salary |
-+----+-------+-----+----------+--------+
-| 1  | John  | 25  | New York | 50000  |
-+----+-------+-----+----------+--------+
-Employee DB > exit employee
-----------------------------------------------------------------------
----------- Thank You for using Customised DBMS Application -----------
-----------------------------------------------------------------------
-```
 ---
 
 ## 📖 License
