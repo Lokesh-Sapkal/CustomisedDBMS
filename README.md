@@ -1,7 +1,7 @@
-# CustomisedDBMS
+# Customised DBMS Application
 
-A Java-based console application simulating a simple Database Management System (DBMS) using LinkedList as the storage.  
-Supports employee record management,  Backup & Restore, and selective SELECT queries.
+A command-line interface (CLI) based database management system designed for managing employee records.   
+This application allows users to perform CRUD operations, backup and restore data and interact with the database through a simple text-based interface.
 
 ---
 
@@ -34,12 +34,10 @@ src/
 
 ## 🚀 Features
 
-- Insert new employee records  
-- SELECT * or SELECT <field> queries (empid, empname, empage, empaddress, empsalary)  
-- Backup database to file  
-- Restore database from backup  
-- Describe schema command (describe Employee)  
-- Console-based table output with field validation  
+- **Insert Records :** Add new employee records to the database.
+- **Select Records :** Retrieve employee information based on specified fields.
+- **Backup & Restore :** Save and load employee data to/from a file.
+- **Schema Description :** View the structure of the employee table.
 
 ---
 
@@ -47,7 +45,7 @@ src/
 
 1. Navigate to the project folder:
 ```bash
-cd src
+cd CustomisedDBMS\src
 ```
 2. Compile the project:
 ```bash
@@ -77,10 +75,28 @@ Select All Fields:
 ```bash
 select * from Employee
 ```
-
-Select Specific Field:
+Select Specific Field(up to 4 fields):
 ```bash
-select <empid|empname|empage|empaddress|empsalary> from Employee
+select empId|empName|empAge|empAddress|empSalary from Employee
+```
+```bash
+select empId empName from Employee
+```
+```bash
+select empId empName empAge from Employee
+```
+```bash
+select empId empName empAddress empSalary from Employee
+```
+Select with aggregate function:
+```bash
+select min|max empAge|empSalary from Employee
+```
+```bash
+select sum|avg empSalary from Employee
+```
+```bash
+select count empId|empName|empAge|empAddress|empSalary from Employee
 ```
 
 Backup Database:
@@ -90,6 +106,9 @@ takebackup Employee
 
 Exit Application:
 ```bash
+exit
+```
+```bash
 exit Employee
 ```
 
@@ -98,10 +117,9 @@ exit Employee
 ## 📌 Future Enhancements
 
 - Add update and delete operations
-- Extend parser for SQL-like commands
 
 ---
 
 ## 📖 License
 
-This project is licensed under the MIT License – see the LICENSE file for details.
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
