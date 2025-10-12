@@ -9,9 +9,10 @@ import java.io.*;
 //                          Serializable interface.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
-
 public class Employee implements Serializable
 {
+    private static final long serialVersionUID = 1L;    // version control ID
+
     public int EmpID;
     public String EmpName;
     public int EmpAge;

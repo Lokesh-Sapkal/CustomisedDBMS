@@ -9,169 +9,337 @@ import com.customiseddbms.dbms.EmployeeDBMS;
 //	Description			:	This class provide utility methods to EmployeeDBMS and DBMSConsoleApp class.
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 public class DBMSUtils
 {
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	IsValidField
-    //	Description             :   This method checks whether the field is valid or not.
-    //	Parameters				:   String(fName)
-    //	Returns					:   NONE
+    //	Method Name			    :	IsValidFields
+    //	Description             :   This method checks whether the fields is valid or not.
+    //	Parameters				:   String[](fName[])
+    //	Returns					:   boolean
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    public static boolean IsValidField(
-                                            String fName    // Field name
+    public static boolean IsValidFields(
+                                            String fName[]      // Array of field name
                                         )
     {
-        boolean bAns = false;
-
-        switch(fName)
+        boolean bAns = true;
+            
+        for(String field : fName)
         {
-            case "empid":
-                bAns = true;
+            switch(field)
+            {
+                case "empid":
+                case "empname":
+                case "empage":
+                case "empaddress":
+                case "empsalary":
+                    break;
+                default:
+                    bAns = false;
+                    break;
+            }
+            if(!bAns)
+            {
                 break;
-
-            case "empname":
-                bAns = true;
-                break;
-                
-            case "empage":
-                bAns = true;
-                break;
-                
-            case "empaddress":
-                bAns = true;
-                break;
-
-            case "empsalary":
-                bAns = true;
-                break;
+            }
         }
 
         return bAns;
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	DisplayTableHeaderAll
-    //	Description             :   This method display employee database header for all fields.
-    //	Parameters				:   NONE
-    //	Returns					:   NONE
+    //	Method Name			    :	AggregateFunction
+    //	Description             :   This method checks whether the aggregate function is valid or not
+    //                              and also call related methods.
+    //	Parameters				:   String(fName)
+    //	Returns					:   boolean
     //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    public static void DisplayAllTableHeaders()
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    public static boolean AggregateFunction(
+                                                  String funcName ,     // Aggregate function name
+                                                  String fName,         // field name
+                                                  EmployeeDBMS eobj     // object of EmployeeDBMS class
+                                             )
     {
-        System.out.println("+--------+--------------+--------+--------------+------------+");
-        System.out.printf("| %-6s | %-12s | %-6s | %-12s | %-10s |%n","ID","Name","Age","Address","Salary");
-        System.out.println("+--------+--------------+--------+--------------+------------+");
+        switch(funcName)
+        {
+            case "max","min":
+                if((fName.equals("empage")) || (fName.equals("empsalary")))
+                {
+                    if(funcName.equals("max"))
+                    {
+                        eobj.SelectMaximumRecord(fName);
+                    }
+                    else
+                    {
+                        eobj.SelectMinimumRecord(fName);
+                    }
+                    return true;
+                }
+                else
+                {
+                    InvalidCommand();
+                }
+                return true;
+            case "sum","avg":
+                if(fName.equals("empsalary"))
+                {
+                    eobj.CalculateSumAndAverage(funcName);
+                }
+                else
+                {
+                    InvalidCommand();
+                }
+                return true;
+            case "count":
+                eobj.CountRecords();
+                return true;
+            default:
+                return false;
+        }
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	DisplaySpecificTableHeader
-    //	Description             :   This method display employee database header for specific field.
-    //	Parameters				:   String(displayMode)
+    //	Method Name			    :	PrintEmployeeTableHeader
+    //	Description             :   This method prints the employee database schema.
+    //	Parameters				:   NONE
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    public static void DisplaySpecificTableHeader(
-                                                    String displayMode    // Define the field to print
+    public static void printSchema()
+    {
+        System.out.println("+---------------+");
+        System.out.println("| Schema\t|");
+        System.out.println("+---------------+");
+        System.out.println("| EmpId \t|");
+        System.out.println("| EmpName\t|");
+        System.out.println("| EmpAge\t|");
+        System.out.println("| EmpAddress\t|");
+        System.out.println("| EmpSalary\t|");
+        System.out.println("+---------------+");
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	PrintEmployeeTableHeader
+    //	Description             :   This method prints the employee database table header.
+    //	Parameters				:   String[](fName[])
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    public static void PrintEmployeeTableHeader(
+                                                    String fName[]    // Array of field name
                                                 )
     {
-        switch(displayMode)
+        String headers[] = new String[fName.length];
+        int widths[] = new int[fName.length];
+
+        for(int i = 0; i < fName.length; i++)
         {
-            case "empid":
-                System.out.println("+--------+");
-                System.out.printf("| %-6s |%n","ID");
-                System.out.println("+--------+");
-                break;
-
-            case "empname":
-                System.out.println("+--------------+");
-                System.out.printf("| %-12s |%n","Name");
-                System.out.println("+--------------+");
-                break;
-                
-            case "empage":
-                System.out.println("+--------+");
-                System.out.printf("| %-6s |%n","Age");
-                System.out.println("+--------+");
-                break;
-                
-            case "empaddress":
-                System.out.println("+--------------+");
-                System.out.printf("| %-12s |%n","Address");
-                System.out.println("+--------------+");
-                break;
-
-            case "empsalary":
-                System.out.println("+------------+");
-                System.out.printf("| %-10s |%n","Salary");
-                System.out.println("+------------+");
-                break;
+            switch(fName[i])
+            {
+                case "empid":
+                    headers[i] = "ID";
+                    widths[i] = 6;
+                    break;
+                case "empname":
+                    headers[i] = "Name";
+                    widths[i] = 12;
+                    break;
+                case "empage":
+                    headers[i] = "Age";
+                    widths[i] = 6;
+                    break;
+                case "empaddress":
+                    headers[i] = "Address";
+                    widths[i] = 12;
+                    break;
+                case "empsalary":
+                    headers[i] = "Salary";
+                    widths[i] = 10;
+                    break;
+                case "avg":
+                    headers[i] = "Average Salary";
+                    widths[i] = 14;
+                    break;
+                case "sum":
+                    headers[i] = "Total Salary";
+                    widths[i] = 12;
+                    break;
+                case "count":
+                    headers[i] = "Count";
+                    widths[i] = 10;
+                    break;
+            }
         }
+
+        PrintCustomTableHeader(headers, widths);
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	PrintCustomTableHeader
+    //	Description             :   This method prints the employee database table header with the 
+    //                              specified column headers and widths.
+    //	Parameters				:   String[](headers[]), int[](widths[])
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    private static void PrintCustomTableHeader(
+                                                    String headers[],   // Array of header(field) name
+                                                    int widths[]        // Array of widths
+                                                )
+    {
+        StringBuilder border = new StringBuilder("+");
+        for (int width : widths) 
+        {
+            border.append("-".repeat(width + 2)).append("+");
+        }
+        System.out.println(border);
+        System.out.print("|");
+        for (int i = 0; i < headers.length; i++) 
+        {
+            System.out.printf(" %-" + widths[i] + "s |", headers[i]);
+        }
+        System.out.println();
+        System.out.println(border);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	DisplayAllFields
-    //	Description             :   This method display all fields of single employee record from database.
-    //	Parameters				:   Employee(eref)
+    //	Description             :   This method display single employee record from database.
+    //	Parameters				:   Employee(eref), String[](fName[])
     //	Returns					:   NONE
     //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    public static void DisplayAllFields(
-                                            Employee eref            // Employee class reference
-                                        )
-    {
-        System.out.printf("| %-6d | %-12s | %-6d | %-12s | %-10d |%n",eref.EmpID,eref.EmpName,eref.EmpAge,eref.EmpAddress,eref.EmpSalary);
-        System.out.println("+--------+--------------+--------+--------------+------------+");
-    }
- 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //	Method Name			    :	DisplaySpecificField
-    //	Description             :   This method display single field of single employee record from database.
-    //	Parameters				:   Employee(eref), String(displayMode)
-    //	Returns					:   NONE
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    public static void DisplaySpecificField(
-                                                Employee eref,          // Employee class reference
-                                                String displayMode      // Define the field to print
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    public static void PrintEmployeeRecord(
+                                                Employee eref,      // Employee class reference
+                                                String fName[]      // Array of field name
                                             )
     {
+        String headers[] = new String[fName.length];
+        int widths[] = new int[fName.length];
+        char cValues[] = new char[fName.length];
 
-        switch(displayMode)
+        for(int i = 0; i < fName.length; i++)
         {
-            case "empid":
-                System.out.printf("| %-6d |%n",eref.EmpID);
-                System.out.println("+--------+");
-                break;
-
-            case "empname":
-                System.out.printf("| %-12s |%n",eref.EmpName);
-                System.out.println("+--------------+");
-                break;
-                
-            case "empage":
-                System.out.printf("| %-6d |%n",eref.EmpAge);
-                System.out.println("+--------+");
-                break;
-                
-            case "empaddress":
-                System.out.printf("| %-12s |%n",eref.EmpAddress);
-                System.out.println("+--------------+");
-                break;
-
-            case "empsalary":
-                System.out.printf("| %-10d |%n",eref.EmpSalary);
-                System.out.println("+------------+");
-                break;
+            switch(fName[i])
+            {
+                case "empid":
+                    headers[i] = "empid";
+                    widths[i] = 6;
+                    cValues[i] = 'd';
+                    break;
+                case "empname":
+                    headers[i] = "empname";
+                    widths[i] = 12;
+                    cValues[i] = 's';
+                    break;
+                case "empage":
+                    headers[i] = "empage";
+                    widths[i] = 6;
+                    cValues[i] = 'd';
+                    break;
+                case "empaddress":
+                    headers[i] = "empaddress";
+                    widths[i] = 12;
+                    cValues[i] = 's';
+                    break;
+                case "empsalary":
+                    headers[i] = "empsalary";
+                    widths[i] = 10;
+                    cValues[i] = 'd';
+                    break;
+            }
         }
-    }   
 
+        PrintCustomRecord(eref,headers,widths,cValues);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	PrintCustomRecord
+    //	Description             :   This method display single employee record from database with the 
+    //                              specified column width and argument type.
+    //	Parameters				:   Employee(eref), String[](headers[]), int[](widths[]), char[](cValues[])
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    private static void PrintCustomRecord(
+                                            Employee eref,      // Employee class reference
+                                            String headers[],   // Array of header(field) name
+                                            int widths[],       // Array of widths
+                                            char cValues[]      // Define argument type
+                                        )
+    {
+        
+        System.out.print("|");
+        for (int i = 0; i < headers.length; i++) 
+        {
+            switch(headers[i])
+            {
+                case "empid":
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpID);
+                    break;
+                case "empname":
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpName);
+                    break;
+                case "empage":
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpAge);
+                    break;
+                case "empaddress":
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpAddress);
+                    break;
+                case "empsalary":
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpSalary);
+                    break;
+            }
+        }
+        System.out.println();
+
+        StringBuilder border = new StringBuilder("+");
+        for (int width : widths) 
+        {
+            border.append("-".repeat(width + 2)).append("+");
+        }
+        System.out.println(border);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	PrintRecord
+    //	Description             :   This method display single record from database with the 
+    //                              specified value(generic), width and argument type.
+    //	Parameters				:   T(value), int(width), char(args)
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static <T> void PrintRecord(
+                                            T value,        // Value of record
+                                            int width,      // Width of record
+                                            char args       // Define argument type
+                                        )
+    {
+        if(args == 'f')
+        {
+            System.out.printf("| %-" + width + ".2f |%n", value);
+        }
+        else
+        {
+            System.out.printf("| %-" + width + args + " |%n", value);
+        }
+        
+        StringBuilder border = new StringBuilder("+");
+
+        border.append("-".repeat(width + 2)).append("+");
+
+        System.out.println(border);
+    }
+ 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	InvalidCommand

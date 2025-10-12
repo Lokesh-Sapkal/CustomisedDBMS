@@ -13,9 +13,9 @@ import java.io.*;
 //                          implements the Serializable interface.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
-
 public class EmployeeDBMS implements Serializable
 {
+    private static final long serialVersionUID = 1L;    // version control ID
     public LinkedList <Employee> Table;
     private static final String FilePath = "data/backups/";
 
@@ -35,14 +35,14 @@ public class EmployeeDBMS implements Serializable
         System.out.println("---------- Customised DBMS Application started successfully. ----------");
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	InsertQuery
-    //	Description             :   This method creates a new employee record in the database.
+    //	Description             :   This method creates a new employee record in the employee database.
     //	Parameters				:   String(name), int(age), String(address), int(salary)
     //	Returns					:   NONE
     //
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     public void InsertQuery(
                                 String name,        //  Employee name
                                 int age,            //  Employee age
@@ -54,45 +54,158 @@ public class EmployeeDBMS implements Serializable
 
         Table.add(eobj);
 
-        System.out.println("New Record inserted succesfully");
+        System.out.println("New Record inserted successfully");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	SelectAll
-    //	Description             :   This method display all employee records from the database.
+    //	Method Name			    :	SelectQuery
+    //	Description             :   This method display employee records from the database.
+    //	Parameters				:   String[] (fNames[])
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    public void SelectQuery(
+                                String fNames[]    // Array of field name
+                            )
+    {
+        DBMSUtils.PrintEmployeeTableHeader(fNames);
+
+        for(Employee eref : Table)
+        {
+            DBMSUtils.PrintEmployeeRecord(eref,fNames);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	SelectMaximumRecord
+    //	Description             :   This method find and display maximum employee record for specific field.
+    //	Parameters				:   String(field)
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void SelectMaximumRecord(
+                                        String field    // Define the field
+                                    )
+    {
+        DBMSUtils.PrintEmployeeTableHeader(new String[] {field});
+
+        int iMax = 0;
+
+        switch(field)
+        {
+            case "empage":
+                for(Employee eref : Table)
+                {
+                    if(iMax < eref.EmpAge)
+                    {
+                        iMax = eref.EmpAge;
+                    }
+                }
+                DBMSUtils.PrintRecord(iMax,6,'d');
+                break;
+            
+            case "empsalary":
+                for(Employee eref : Table)
+                {
+                    if(iMax < eref.EmpSalary)
+                    {
+                        iMax = eref.EmpSalary;
+                    }      
+                }
+                DBMSUtils.PrintRecord(iMax,10,'d');
+                break;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	SelectMinimumRecord
+    //	Description             :   This method find and display minimum employee record for specific field.
+    //	Parameters				:   String(field)
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void SelectMinimumRecord(
+                                        String field    // Define the field
+                                    )
+    {
+        DBMSUtils.PrintEmployeeTableHeader(new String[] {field});
+
+        int iMin = Integer.MAX_VALUE;
+
+        switch(field)
+        {
+            case "empage":
+                for(Employee eref : Table)
+                {
+                    if(iMin > eref.EmpAge)
+                    {
+                        iMin = eref.EmpAge;
+                    }
+                }
+                DBMSUtils.PrintRecord(iMin,6,'d');
+                break;
+            
+            case "empsalary":
+                for(Employee eref : Table)
+                {
+                    if(iMin > eref.EmpSalary)
+                    {
+                        iMin = eref.EmpSalary;
+                    }
+                }
+                DBMSUtils.PrintRecord(iMin,10,'d');
+                break;
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	CalculateSumAndAverage
+    //	Description             :   This method apply summation or average operation on employee record.
+    //	Parameters				:   String(fName)
+    //	Returns					:   NONE
+    //
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void CalculateSumAndAverage(
+                                            String fName    // Define the function
+                                        )
+    {
+        long lSum = 0L;
+
+        for(Employee eref : Table)
+        {
+            lSum += eref.EmpSalary;
+        }
+
+        if((fName.equals("avg")) && (Table.size() != 0))
+        {
+            double dAvg = (double)lSum/Table.size();
+
+            DBMSUtils.PrintEmployeeTableHeader(new String[] {"avg"});
+            DBMSUtils.PrintRecord(dAvg,14,'f');
+        }
+        else if(fName.equals("sum"))
+        {
+            DBMSUtils.PrintEmployeeTableHeader(new String[] {"sum"});
+            DBMSUtils.PrintRecord(lSum,12,'d');
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	CountRecords
+    //	Description             :   This method Count employee database records.
     //	Parameters				:   NONE
     //	Returns					:   NONE
     //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    public void SelectAllFields()
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void CountRecords()
     {
-        DBMSUtils.DisplayAllTableHeaders();
-
-        for(Employee eref : Table)
-        {
-            DBMSUtils.DisplayAllFields(eref);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //	Method Name			    :	SelectOneField
-    //	Description             :   This method display specific employee records from the database.
-    //	Parameters				:   String(displayMode)
-    //	Returns					:   NONE
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    public void SelectSpecificField(
-                                        String displayMode    // Define the field to print
-                                    )
-    {
-        DBMSUtils.DisplaySpecificTableHeader(displayMode);
-
-        for(Employee eref : Table)
-        {
-            DBMSUtils.DisplaySpecificField(eref, displayMode);
-        }
+        DBMSUtils.PrintEmployeeTableHeader(new String[] {"count"});
+        DBMSUtils.PrintRecord(Table.size(),10,'d');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
