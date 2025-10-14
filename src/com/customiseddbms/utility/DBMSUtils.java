@@ -13,17 +13,32 @@ public class DBMSUtils
 {
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	IsValidFields
+    //	Method Name			    :	DBMSUtils
+    //	Description             :	This is a private constructor of class DBMSUtils 
+    //                              which prevents instantiation of this utility class.
+    //                              It throws an AssertionError if object creation is attempted.
+    //	Parameters				:	NONE
+    //	Returns					:	NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    private DBMSUtils()
+    {
+        throw new AssertionError("Cannot instantiate utility class");
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	isValidFields
     //	Description             :   This method checks whether the fields is valid or not.
     //	Parameters				:   String[](fName[])
     //	Returns					:   boolean
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    public static boolean IsValidFields(
+    public static boolean isValidFields(
                                             String fName[]      // Array of field name
                                         )
     {
-        boolean bAns = true;
+        boolean isValid = true;
             
         for(String field : fName)
         {
@@ -36,28 +51,28 @@ public class DBMSUtils
                 case "empsalary":
                     break;
                 default:
-                    bAns = false;
+                    isValid = false;
                     break;
             }
-            if(!bAns)
+            if(!isValid)
             {
                 break;
             }
         }
 
-        return bAns;
+        return isValid;
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	AggregateFunction
+    //	Method Name			    :	isAggregateFunction
     //	Description             :   This method checks whether the aggregate function is valid or not
     //                              and also call related methods.
     //	Parameters				:   String(fName)
     //	Returns					:   boolean
     //
     //////////////////////////////////////////////////////////////////////////////////////////////////
-    public static boolean AggregateFunction(
+    public static boolean isAggregateFunction(
                                                   String funcName ,     // Aggregate function name
                                                   String fName,         // field name
                                                   EmployeeDBMS eobj     // object of EmployeeDBMS class
@@ -70,31 +85,31 @@ public class DBMSUtils
                 {
                     if(funcName.equals("max"))
                     {
-                        eobj.SelectMaximumRecord(fName);
+                        eobj.selectMaximumRecord(fName);
                     }
                     else
                     {
-                        eobj.SelectMinimumRecord(fName);
+                        eobj.selectMinimumRecord(fName);
                     }
                     return true;
                 }
                 else
                 {
-                    InvalidCommand();
+                    invalidCommand();
                 }
                 return true;
             case "sum","avg":
                 if(fName.equals("empsalary"))
                 {
-                    eobj.CalculateSumAndAverage(funcName);
+                    eobj.calculateSumAndAverage(funcName);
                 }
                 else
                 {
-                    InvalidCommand();
+                    invalidCommand();
                 }
                 return true;
             case "count":
-                eobj.CountRecords();
+                eobj.countRecords();
                 return true;
             default:
                 return false;
@@ -103,7 +118,7 @@ public class DBMSUtils
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	PrintEmployeeTableHeader
+    //	Method Name			    :	printSchema
     //	Description             :   This method prints the employee database schema.
     //	Parameters				:   NONE
     //	Returns					:   NONE
@@ -114,23 +129,23 @@ public class DBMSUtils
         System.out.println("+---------------+");
         System.out.println("| Schema\t|");
         System.out.println("+---------------+");
-        System.out.println("| EmpId \t|");
-        System.out.println("| EmpName\t|");
-        System.out.println("| EmpAge\t|");
-        System.out.println("| EmpAddress\t|");
-        System.out.println("| EmpSalary\t|");
+        System.out.println("| empId \t|");
+        System.out.println("| empName\t|");
+        System.out.println("| empAge\t|");
+        System.out.println("| empAddress\t|");
+        System.out.println("| empSalary\t|");
         System.out.println("+---------------+");
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	PrintEmployeeTableHeader
+    //	Method Name			    :	printEmployeeTableHeader
     //	Description             :   This method prints the employee database table header.
     //	Parameters				:   String[](fName[])
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    public static void PrintEmployeeTableHeader(
+    public static void printEmployeeTableHeader(
                                                     String fName[]    // Array of field name
                                                 )
     {
@@ -176,19 +191,19 @@ public class DBMSUtils
             }
         }
 
-        PrintCustomTableHeader(headers, widths);
+        printCustomTableHeader(headers, widths);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	PrintCustomTableHeader
+    //	Method Name			    :	printCustomTableHeader
     //	Description             :   This method prints the employee database table header with the 
     //                              specified column headers and widths.
     //	Parameters				:   String[](headers[]), int[](widths[])
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    private static void PrintCustomTableHeader(
+    private static void printCustomTableHeader(
                                                     String headers[],   // Array of header(field) name
                                                     int widths[]        // Array of widths
                                                 )
@@ -210,13 +225,13 @@ public class DBMSUtils
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	DisplayAllFields
+    //	Method Name			    :	printEmployeeRecord
     //	Description             :   This method display single employee record from database.
     //	Parameters				:   Employee(eref), String[](fName[])
     //	Returns					:   NONE
     //
     //////////////////////////////////////////////////////////////////////////////////////////////////
-    public static void PrintEmployeeRecord(
+    public static void printEmployeeRecord(
                                                 Employee eref,      // Employee class reference
                                                 String fName[]      // Array of field name
                                             )
@@ -257,19 +272,19 @@ public class DBMSUtils
             }
         }
 
-        PrintCustomRecord(eref,headers,widths,cValues);
+        printCustomRecord(eref,headers,widths,cValues);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	PrintCustomRecord
+    //	Method Name			    :	printCustomRecord
     //	Description             :   This method display single employee record from database with the 
     //                              specified column width and argument type.
     //	Parameters				:   Employee(eref), String[](headers[]), int[](widths[]), char[](cValues[])
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    private static void PrintCustomRecord(
+    private static void printCustomRecord(
                                             Employee eref,      // Employee class reference
                                             String headers[],   // Array of header(field) name
                                             int widths[],       // Array of widths
@@ -283,19 +298,19 @@ public class DBMSUtils
             switch(headers[i])
             {
                 case "empid":
-                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpID);
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.getEmpId());
                     break;
                 case "empname":
-                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpName);
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.getEmpName());
                     break;
                 case "empage":
-                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpAge);
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.getEmpAge());
                     break;
                 case "empaddress":
-                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpAddress);
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.getEmpAddress());
                     break;
                 case "empsalary":
-                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.EmpSalary);
+                    System.out.printf(" %-" + widths[i] + cValues[i] + " |", eref.getEmpSalary());
                     break;
             }
         }
@@ -311,14 +326,14 @@ public class DBMSUtils
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	PrintRecord
+    //	Method Name			    :	printRecord
     //	Description             :   This method display single record from database with the 
     //                              specified value(generic), width and argument type.
     //	Parameters				:   T(value), int(width), char(args)
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    public static <T> void PrintRecord(
+    public static <T> void printRecord(
                                             T value,        // Value of record
                                             int width,      // Width of record
                                             char args       // Define argument type
@@ -342,13 +357,13 @@ public class DBMSUtils
  
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	InvalidCommand
+    //	Method Name			    :	invalidCommand
     //	Description             :   This method display error message if command mismatched.
     //	Parameters				:   NONE
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    public static void InvalidCommand()
+    public static void invalidCommand()
     {
         System.out.println("Command not found");
         System.out.println("Please give valid command.");

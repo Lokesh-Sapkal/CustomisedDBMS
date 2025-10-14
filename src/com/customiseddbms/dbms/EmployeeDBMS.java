@@ -16,8 +16,8 @@ import java.io.*;
 public class EmployeeDBMS implements Serializable
 {
     private static final long serialVersionUID = 1L;    // version control ID
-    public LinkedList <Employee> Table;
-    private static final String FilePath = "data/backups/";
+    private LinkedList <Employee> table;
+    private static final String FILE_PATH = "data" + File.separator + "backups" + File.separator;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -30,20 +30,33 @@ public class EmployeeDBMS implements Serializable
     ///////////////////////////////////////////////////////////////////////////////////////////
     public EmployeeDBMS()
     {
-        Table = new LinkedList <Employee> ();
+        table = new LinkedList <Employee> ();
         System.out.println("----------------------------------------------------------------------");
-        System.out.println("---------- Customised DBMS Application started successfully. ----------");
+        System.out.println("---------- Customised DBMS Application started successfully ----------");
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	getTable
+    //	Description             :   This method returns the employee table.
+    //	Parameters				:   NONE
+    //	Returns					:   LinkedList<Employee>(table)
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public LinkedList <Employee> getTable()
+    {
+        return table;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	InsertQuery
+    //	Method Name			    :	insertQuery
     //	Description             :   This method creates a new employee record in the employee database.
     //	Parameters				:   String(name), int(age), String(address), int(salary)
     //	Returns					:   NONE
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void InsertQuery(
+    public void insertQuery(
                                 String name,        //  Employee name
                                 int age,            //  Employee age
                                 String address,     //  Employee address
@@ -52,183 +65,183 @@ public class EmployeeDBMS implements Serializable
     {
         Employee eobj = new Employee(name,age,address,salary);
 
-        Table.add(eobj);
+        table.add(eobj);
 
         System.out.println("New Record inserted successfully");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	SelectQuery
+    //	Method Name			    :	selectQuery
     //	Description             :   This method display employee records from the database.
     //	Parameters				:   String[] (fNames[])
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    public void SelectQuery(
+    public void selectQuery(
                                 String fNames[]    // Array of field name
                             )
     {
-        DBMSUtils.PrintEmployeeTableHeader(fNames);
+        DBMSUtils.printEmployeeTableHeader(fNames);
 
-        for(Employee eref : Table)
+        for(Employee eref : table)
         {
-            DBMSUtils.PrintEmployeeRecord(eref,fNames);
+            DBMSUtils.printEmployeeRecord(eref,fNames);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	SelectMaximumRecord
+    //	Method Name			    :	selectMaximumRecord
     //	Description             :   This method find and display maximum employee record for specific field.
     //	Parameters				:   String(field)
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void SelectMaximumRecord(
+    public void selectMaximumRecord(
                                         String field    // Define the field
                                     )
     {
-        DBMSUtils.PrintEmployeeTableHeader(new String[] {field});
+        DBMSUtils.printEmployeeTableHeader(new String[] {field});
 
         int iMax = 0;
 
         switch(field)
         {
             case "empage":
-                for(Employee eref : Table)
+                for(Employee eref : table)
                 {
-                    if(iMax < eref.EmpAge)
+                    if(iMax < eref.getEmpAge())
                     {
-                        iMax = eref.EmpAge;
+                        iMax = eref.getEmpAge();
                     }
                 }
-                DBMSUtils.PrintRecord(iMax,6,'d');
+                DBMSUtils.printRecord(iMax,6,'d');
                 break;
             
             case "empsalary":
-                for(Employee eref : Table)
+                for(Employee eref : table)
                 {
-                    if(iMax < eref.EmpSalary)
+                    if(iMax < eref.getEmpSalary())
                     {
-                        iMax = eref.EmpSalary;
+                        iMax = eref.getEmpSalary();
                     }      
                 }
-                DBMSUtils.PrintRecord(iMax,10,'d');
+                DBMSUtils.printRecord(iMax,10,'d');
                 break;
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	SelectMinimumRecord
+    //	Method Name			    :	selectMinimumRecord
     //	Description             :   This method find and display minimum employee record for specific field.
     //	Parameters				:   String(field)
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void SelectMinimumRecord(
+    public void selectMinimumRecord(
                                         String field    // Define the field
                                     )
     {
-        DBMSUtils.PrintEmployeeTableHeader(new String[] {field});
+        DBMSUtils.printEmployeeTableHeader(new String[] {field});
 
         int iMin = Integer.MAX_VALUE;
 
         switch(field)
         {
             case "empage":
-                for(Employee eref : Table)
+                for(Employee eref : table)
                 {
-                    if(iMin > eref.EmpAge)
+                    if(iMin > eref.getEmpAge())
                     {
-                        iMin = eref.EmpAge;
+                        iMin = eref.getEmpAge();
                     }
                 }
-                DBMSUtils.PrintRecord(iMin,6,'d');
+                DBMSUtils.printRecord(iMin,6,'d');
                 break;
             
             case "empsalary":
-                for(Employee eref : Table)
+                for(Employee eref : table)
                 {
-                    if(iMin > eref.EmpSalary)
+                    if(iMin > eref.getEmpSalary())
                     {
-                        iMin = eref.EmpSalary;
+                        iMin = eref.getEmpSalary();
                     }
                 }
-                DBMSUtils.PrintRecord(iMin,10,'d');
+                DBMSUtils.printRecord(iMin,10,'d');
                 break;
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	CalculateSumAndAverage
+    //	Method Name			    :	calculateSumAndAverage
     //	Description             :   This method apply summation or average operation on employee record.
     //	Parameters				:   String(fName)
     //	Returns					:   NONE
     //
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void CalculateSumAndAverage(
+    public void calculateSumAndAverage(
                                             String fName    // Define the function
                                         )
     {
         long lSum = 0L;
 
-        for(Employee eref : Table)
+        for(Employee eref : table)
         {
-            lSum += eref.EmpSalary;
+            lSum += eref.getEmpSalary();
         }
 
-        if((fName.equals("avg")) && (Table.size() != 0))
+        if((fName.equals("avg")) && (table.size() != 0))
         {
-            double dAvg = (double)lSum/Table.size();
+            double dAvg = (double)lSum/table.size();
 
-            DBMSUtils.PrintEmployeeTableHeader(new String[] {"avg"});
-            DBMSUtils.PrintRecord(dAvg,14,'f');
+            DBMSUtils.printEmployeeTableHeader(new String[] {"avg"});
+            DBMSUtils.printRecord(dAvg,14,'f');
         }
         else if(fName.equals("sum"))
         {
-            DBMSUtils.PrintEmployeeTableHeader(new String[] {"sum"});
-            DBMSUtils.PrintRecord(lSum,12,'d');
+            DBMSUtils.printEmployeeTableHeader(new String[] {"sum"});
+            DBMSUtils.printRecord(lSum,12,'d');
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	CountRecords
+    //	Method Name			    :	countRecords
     //	Description             :   This method Count employee database records.
     //	Parameters				:   NONE
     //	Returns					:   NONE
     //
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void CountRecords()
+    public void countRecords()
     {
-        DBMSUtils.PrintEmployeeTableHeader(new String[] {"count"});
-        DBMSUtils.PrintRecord(Table.size(),10,'d');
+        DBMSUtils.printEmployeeTableHeader(new String[] {"count"});
+        DBMSUtils.printRecord(table.size(),10,'d');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	TakeBackup
+    //	Method Name			    :	takeBackup
     //	Description             :   This method stores/write an object of the EmployeeDBMS class in a file.
     //	Parameters				:   String(fName)
     //	Returns					:   NONE
     //
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void TakeBackup(
+    public void takeBackup(
                                 String fName    // File name
                             )
     {
         try
         {
-            File dir = new File(FilePath);
+            File dir = new File(FILE_PATH);
             if(!dir.exists())
             {
                 dir.mkdirs();
             }
 
-            String fPath = FilePath+fName;
+            String fPath = FILE_PATH+fName+".ser";
             
             FileOutputStream fos = new FileOutputStream(fPath);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -249,19 +262,19 @@ public class EmployeeDBMS implements Serializable
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	RestoreBackup
+    //	Method Name			    :	restoreBackup
     //	Description             :   This method reads an object of the EmployeeDBMS class from the file.
     //	Parameters				:   String(fName)
     //	Returns					:   EmployeeDBMS(object)
     //
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    public static EmployeeDBMS RestoreBackup(
+    public static EmployeeDBMS restoreBackup(
                                                 String fName    // File name
                                             )
     {
         try
         {
-            String fPath = FilePath+fName;
+            String fPath = FILE_PATH+fName+".ser";
             EmployeeDBMS empobj = null;
             
             FileInputStream fis = new FileInputStream(fPath);

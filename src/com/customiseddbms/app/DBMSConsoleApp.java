@@ -29,14 +29,14 @@ public class DBMSConsoleApp
     {
         String str = null;
         boolean exitloop = true;
-        String FileName = "employeeDB.ser";
+        String FileName = "employeeDB";
 
         if(A.length != 0)
         {
             FileName = A[0];
         }
 
-        EmployeeDBMS eobj = EmployeeDBMS.RestoreBackup(FileName);
+        EmployeeDBMS eobj = EmployeeDBMS.restoreBackup(FileName);
         
         if(eobj == null)
         {
@@ -46,11 +46,11 @@ public class DBMSConsoleApp
         {
             int iMax = 0;
 
-            for(Employee eref : eobj.Table)
+            for(Employee eref : eobj.getTable())
             {
-                if(iMax < eref.EmpID)
+                if(iMax < eref.getEmpId())
                 {
-                    iMax = eref.EmpID;
+                    iMax = eref.getEmpId();
                 }
             }
             Employee.iCounter = ++iMax;
@@ -91,7 +91,7 @@ public class DBMSConsoleApp
                         }
                         else
                         {
-                            DBMSUtils.InvalidCommand();
+                            DBMSUtils.invalidCommand();
                         }
                         break;
 
@@ -102,7 +102,7 @@ public class DBMSConsoleApp
                         }
                         else
                         {
-                            DBMSUtils.InvalidCommand();
+                            DBMSUtils.invalidCommand();
                         }
                         break;
 
@@ -111,11 +111,11 @@ public class DBMSConsoleApp
                         {
                             if((tokens.length == 8) && (tokens[1].equalsIgnoreCase("into")) && (tokens[2].equalsIgnoreCase("Employee")) && (tokens[3].equalsIgnoreCase("Values")))
                             {
-                                eobj.InsertQuery(tokens[4],Integer.parseInt(tokens[5]),tokens[6],Integer.parseInt(tokens[7]));
+                                eobj.insertQuery(tokens[4],Integer.parseInt(tokens[5]),tokens[6],Integer.parseInt(tokens[7]));
                             }
                             else
                             {
-                                DBMSUtils.InvalidCommand();
+                                DBMSUtils.invalidCommand();
                             }
                         }
                         catch(NumberFormatException nfeobj)
@@ -141,20 +141,20 @@ public class DBMSConsoleApp
                                     if(Field[0].equals("*"))
                                     {
                                         String Fields[] = {"empid","empname","empage","empaddress","empsalary"};
-                                        eobj.SelectQuery(Fields);
+                                        eobj.selectQuery(Fields);
                                     }
-                                    else if(DBMSUtils.IsValidFields(Field))
+                                    else if(DBMSUtils.isValidFields(Field))
                                     {
-                                        eobj.SelectQuery(Field);
+                                        eobj.selectQuery(Field);
                                     }
                                     else
                                     {
-                                        DBMSUtils.InvalidCommand();
+                                        DBMSUtils.invalidCommand();
                                     }
                                 }
                                 else
                                 {
-                                    DBMSUtils.InvalidCommand();
+                                    DBMSUtils.invalidCommand();
                                 }
                                 break;
 
@@ -166,28 +166,28 @@ public class DBMSConsoleApp
                                     Fields[0] = (tokens[1]).toLowerCase();
                                     Fields[1] = (tokens[2]).toLowerCase();
 
-                                    if(DBMSUtils.IsValidFields(new String[] {Fields[1]}))
+                                    if(DBMSUtils.isValidFields(new String[] {Fields[1]}))
                                     {
-                                        if(!(DBMSUtils.AggregateFunction(Fields[0], Fields[1], eobj)))
+                                        if(!(DBMSUtils.isAggregateFunction(Fields[0], Fields[1], eobj)))
                                         {
-                                            if(DBMSUtils.IsValidFields(Fields))
+                                            if(DBMSUtils.isValidFields(Fields))
                                             {
-                                                eobj.SelectQuery(Fields);
+                                                eobj.selectQuery(Fields);
                                             }
                                             else
                                             {
-                                                DBMSUtils.InvalidCommand();
+                                                DBMSUtils.invalidCommand();
                                             }
                                         }
                                     }
                                     else
                                     {
-                                        DBMSUtils.InvalidCommand();
+                                        DBMSUtils.invalidCommand();
                                     }
                                 }
                                 else
                                 {
-                                    DBMSUtils.InvalidCommand();
+                                    DBMSUtils.invalidCommand();
                                 }
                                 break;
 
@@ -200,18 +200,18 @@ public class DBMSConsoleApp
                                     Fields[1] = (tokens[2]).toLowerCase();
                                     Fields[2] = (tokens[3]).toLowerCase();
 
-                                    if(DBMSUtils.IsValidFields(Fields))
+                                    if(DBMSUtils.isValidFields(Fields))
                                     {
-                                        eobj.SelectQuery(Fields);
+                                        eobj.selectQuery(Fields);
                                     }
                                     else
                                     {
-                                        DBMSUtils.InvalidCommand();
+                                        DBMSUtils.invalidCommand();
                                     }
                                 }
                                 else
                                 {
-                                    DBMSUtils.InvalidCommand();
+                                    DBMSUtils.invalidCommand();
                                 }
                                 break;
 
@@ -225,22 +225,28 @@ public class DBMSConsoleApp
                                     Fields[2] = (tokens[3]).toLowerCase();
                                     Fields[3] = (tokens[4]).toLowerCase();
 
-                                    if(DBMSUtils.IsValidFields(Fields))
+                                    if(DBMSUtils.isValidFields(Fields))
                                     {
-                                        eobj.SelectQuery(Fields);
+                                        eobj.selectQuery(Fields);
                                     }
                                     else
                                     {
-                                        DBMSUtils.InvalidCommand();
+                                        DBMSUtils.invalidCommand();
                                     }
                                 }
                                 else
                                 {
-                                    DBMSUtils.InvalidCommand();
+                                    DBMSUtils.invalidCommand();
                                 }
                                 break;
+
+                            // case 8:
+                            //     if((tokens[5].equalsIgnoreCase("from")) && (tokens[6].equalsIgnoreCase("Employee")))
+                            //     {
+
+                            //     break;
                             default:
-                                DBMSUtils.InvalidCommand();
+                                DBMSUtils.invalidCommand();
                         }
                         break;
 
@@ -253,11 +259,11 @@ public class DBMSConsoleApp
                     case "takebackup":
                         if((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee")))
                         {
-                            eobj.TakeBackup(FileName);
+                            eobj.takeBackup(FileName);
                         }
                         else
                         {
-                            DBMSUtils.InvalidCommand();
+                            DBMSUtils.invalidCommand();
                         }
                         break;
 

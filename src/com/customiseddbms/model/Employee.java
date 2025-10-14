@@ -13,11 +13,11 @@ public class Employee implements Serializable
 {
     private static final long serialVersionUID = 1L;    // version control ID
 
-    public int EmpID;
-    public String EmpName;
-    public int EmpAge;
-    public String EmpAddress;
-    public int EmpSalary;
+    private int empId;
+    private String empName;
+    private int empAge;
+    private String empAddress;
+    private int empSalary;
 
     public static int iCounter;
 
@@ -42,11 +42,128 @@ public class Employee implements Serializable
                         int salary          //  Employee salary
                     )
     {
-        this.EmpID = iCounter++;
-        this.EmpName = name;
-        this.EmpAge = age;
-        this.EmpAddress = address;
-        this.EmpSalary = salary;
+        this.empId = iCounter++;
+        this.empName = name;
+        this.empAge = age;
+        this.empAddress = address;
+        this.empSalary = salary;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	getEmpId
+    //	Description             :   This method returns the employee id.
+    //	Parameters				:   NONE
+    //	Returns					:   int(empId)
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public int getEmpId()
+    {
+        return empId;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	setEmpName
+    //	Description             :   This method sets the employee name.
+    //	Parameters				:   String(name)
+    //	Returns					:   NONE
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public void setEmpName(String name) 
+    {
+        this.empName = name;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	getEmpName
+    //	Description             :   This method returns the employee name.
+    //	Parameters				:   NONE
+    //	Returns					:   String(empName)
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public String getEmpName() 
+    {
+        return empName;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	setEmpAge
+    //	Description             :   This method sets the employee age.
+    //	Parameters				:   int(age)
+    //	Returns					:   NONE
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public void setEmpAge(int age) 
+    {
+        this.empAge = age;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	getEmpAge
+    //	Description             :   This method returns the employee age.
+    //	Parameters				:   NONE
+    //	Returns					:   int(empAge)
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public int getEmpAge() 
+    {
+        return empAge;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	setEmpAddress
+    //	Description             :   This method sets the employee address.
+    //	Parameters				:   String(address)
+    //	Returns					:   NONE
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public void setEmpAddress(String address) 
+    {
+        this.empAddress = address;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	getEmpAddress
+    //	Description             :   This method returns the employee address.
+    //	Parameters				:   NONE
+    //	Returns					:   String(empAddress)
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public String getEmpAddress() 
+    {
+        return empAddress;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	setEmpSalary
+    //	Description             :   This method sets the employee salary.
+    //	Parameters				:   int(salary)
+    //	Returns					:   NONE
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public void setEmpSalary(int salary) 
+    {
+        this.empSalary = salary;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	getEmpSalary
+    //	Description             :   This method returns the employee salary.
+    //	Parameters				:   NONE
+    //	Returns					:   int(empSalary)
+    //
+    /////////////////////////////////////////////////////////////////////////////
+    public int getEmpSalary() 
+    {
+        return empSalary;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +177,6 @@ public class Employee implements Serializable
     ///////////////////////////////////////////////////////////////////////////////////////////
     public String toString()
     {
-        return "ID : "+this.EmpID+" Name : "+this.EmpName+" Age : "+this.EmpAge+" Address : "+this.EmpAddress+" Salary : "+this.EmpSalary;
+        return "ID : "+this.empId+" Name : "+this.empName+" Age : "+this.empAge+" Address : "+this.empAddress+" Salary : "+this.empSalary;
     }
 }
