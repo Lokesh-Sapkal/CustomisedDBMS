@@ -90,6 +90,89 @@ public class EmployeeDBMS implements Serializable
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	selectSpecificIntegerRecords
+    //	Description             :   This method display specific integer employee records from the database.
+    //	Parameters				:   String[](fNames[]), String(fName), String(operator), int(Value)
+    //	Returns					:   NONE
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void selectSpecificIntegerRecords(
+                                                String fNames[],        // Array of field name
+                                                String fName,           // Field name
+                                                String operator,        // Define operator
+                                                int value               // Value of field
+                                            )
+    {
+        DBMSUtils.printEmployeeTableHeader(fNames);
+        boolean bFound = false;
+
+        for (Employee eref : table) 
+        {
+            int fieldValue = DBMSUtils.extractIntField(fName, eref);
+            if(DBMSUtils.evaluateCondition(fieldValue, operator, value)) 
+            {
+                bFound = true;
+                DBMSUtils.printEmployeeRecord(eref, fNames);
+            }
+        }
+
+        if(!bFound)
+        {
+            System.out.println("Record not found");
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	selectSpecificStringRecords
+    //	Description             :   This method display specific string employee records from the database.
+    //	Parameters				:   String[](fNames[]), String(fName), String(operator), String(Value)
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void selectSpecificStringRecords(
+                                                String fNames[],        // Array of field name
+                                                String fName,           // Field name
+                                                String operator,        // Define operator
+                                                String value            // Value of field
+                                            )
+    {
+        DBMSUtils.printEmployeeTableHeader(fNames);
+        boolean bFound = false;
+
+        switch(fName)
+        {
+            case "empname":
+                for(Employee eref : table)
+                {
+                    if(eref.getEmpName().equalsIgnoreCase(value))
+                    {
+                        bFound = true;
+                        DBMSUtils.printEmployeeRecord(eref,fNames);
+                    }
+                }
+                break;
+
+            case "empaddress":
+                for(Employee eref : table)
+                {
+                    if(eref.getEmpAddress().equalsIgnoreCase(value))
+                    {
+                        bFound = true;
+                        DBMSUtils.printEmployeeRecord(eref,fNames);
+                    }
+                }
+                break;
+        }
+
+        if(!bFound)
+        {
+            System.out.println("Record not found");
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	selectMaximumRecord
@@ -105,6 +188,7 @@ public class EmployeeDBMS implements Serializable
         DBMSUtils.printEmployeeTableHeader(new String[] {field});
 
         int iMax = 0;
+        boolean bFound = false;
 
         switch(field)
         {
@@ -113,10 +197,18 @@ public class EmployeeDBMS implements Serializable
                 {
                     if(iMax < eref.getEmpAge())
                     {
+                        bFound = true;
                         iMax = eref.getEmpAge();
                     }
                 }
-                DBMSUtils.printRecord(iMax,6,'d');
+                if(bFound)
+                {
+                    DBMSUtils.printRecord(iMax,6,'d');
+                }
+                else
+                {
+                    System.out.println("Record not found");
+                }
                 break;
             
             case "empsalary":
@@ -124,10 +216,18 @@ public class EmployeeDBMS implements Serializable
                 {
                     if(iMax < eref.getEmpSalary())
                     {
+                        bFound = true;
                         iMax = eref.getEmpSalary();
                     }      
                 }
-                DBMSUtils.printRecord(iMax,10,'d');
+                if(bFound)
+                {
+                    DBMSUtils.printRecord(iMax,10,'d');
+                }
+                else
+                {
+                    System.out.println("Record not found");
+                }
                 break;
         }
     }
@@ -147,6 +247,7 @@ public class EmployeeDBMS implements Serializable
         DBMSUtils.printEmployeeTableHeader(new String[] {field});
 
         int iMin = Integer.MAX_VALUE;
+        boolean bFound = false;
 
         switch(field)
         {
@@ -155,10 +256,18 @@ public class EmployeeDBMS implements Serializable
                 {
                     if(iMin > eref.getEmpAge())
                     {
+                        bFound = true;
                         iMin = eref.getEmpAge();
                     }
                 }
-                DBMSUtils.printRecord(iMin,6,'d');
+                if(bFound)
+                {
+                    DBMSUtils.printRecord(iMin,6,'d');
+                }
+                else
+                {
+                    System.out.println("Record not found");
+                }
                 break;
             
             case "empsalary":
@@ -166,10 +275,18 @@ public class EmployeeDBMS implements Serializable
                 {
                     if(iMin > eref.getEmpSalary())
                     {
+                        bFound = true;
                         iMin = eref.getEmpSalary();
                     }
                 }
-                DBMSUtils.printRecord(iMin,10,'d');
+                if(bFound)
+                {
+                    DBMSUtils.printRecord(iMin,10,'d');
+                }
+                else
+                {
+                    System.out.println("Record not found");
+                }
                 break;
         }
     }
@@ -290,9 +407,15 @@ public class EmployeeDBMS implements Serializable
             
             return empobj;
         }
-        catch(Exception eobj)
+        catch(FileNotFoundException eobj1)
+        {
+            System.out.printf("Backup file (%s) not found. \n",fName);
+            return null;
+        }
+        catch(Exception eobj2)
         {
             System.out.println("Failed to restore backup from "+fName);
+            System.out.println("error : "+eobj2.getMessage());
             return null;
         }
     }

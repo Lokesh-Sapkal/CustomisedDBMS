@@ -44,11 +44,7 @@ public class DBMSUtils
         {
             switch(field)
             {
-                case "empid":
-                case "empname":
-                case "empage":
-                case "empaddress":
-                case "empsalary":
+                case "empid","empname","empage","empaddress","empsalary":
                     break;
                 default:
                     isValid = false;
@@ -68,7 +64,7 @@ public class DBMSUtils
     //	Method Name			    :	isAggregateFunction
     //	Description             :   This method checks whether the aggregate function is valid or not
     //                              and also call related methods.
-    //	Parameters				:   String(fName)
+    //	Parameters				:   String(funcName), String(fName), EmployeeDBMS(eobj)
     //	Returns					:   boolean
     //
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,9 +74,11 @@ public class DBMSUtils
                                                   EmployeeDBMS eobj     // object of EmployeeDBMS class
                                              )
     {
+        boolean isValid = false;
         switch(funcName)
         {
             case "max","min":
+                isValid = true;
                 if((fName.equals("empage")) || (fName.equals("empsalary")))
                 {
                     if(funcName.equals("max"))
@@ -91,14 +89,15 @@ public class DBMSUtils
                     {
                         eobj.selectMinimumRecord(fName);
                     }
-                    return true;
                 }
                 else
                 {
                     invalidCommand();
                 }
-                return true;
+                break;
+
             case "sum","avg":
+                isValid = true;
                 if(fName.equals("empsalary"))
                 {
                     eobj.calculateSumAndAverage(funcName);
@@ -107,13 +106,126 @@ public class DBMSUtils
                 {
                     invalidCommand();
                 }
-                return true;
+                break;
+
             case "count":
-                eobj.countRecords();
-                return true;
-            default:
-                return false;
+                isValid = true;
+                if(isValidFields(new String[] {fName}))
+                {
+                    eobj.countRecords();
+                }
+                else
+                {
+                    invalidCommand();
+                }
+                break;
         }
+
+        return isValid;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	checkRelationalOperator
+    //	Description             :   This method checks whether the operator is valid or not and also
+    //                              call related methods.
+    //	Parameters				:   String[](fNames[]), String(fName), String(operator), T(value),
+    //                              EmployeeDBMS(eobj)
+    //	Returns					:   void
+    //
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    public static <T> void checkRelationalOperator(
+                                                        String fNames[],        // Array of field name
+                                                        String fName,           // Field name
+                                                        String operator,        // Define operator
+                                                        T value,                // Value of field
+                                                        EmployeeDBMS eobj       // object of EmployeeDBMS class
+                                                    )
+    {
+        switch(fName)
+        {
+            case "empid","empage","empsalary":
+                switch(operator)
+                {
+                    case "=","!=",">","<",">=","<=":
+                        eobj.selectSpecificIntegerRecords(fNames,fName,operator,(Integer) value);
+                        break;
+                    default:
+                        invalidCommand();
+                        break;
+                }
+                break;
+
+            case "empname","empaddress":
+                if(operator.equals("="))
+                {
+                    eobj.selectSpecificStringRecords(fNames,fName,operator,(String) value);
+                }
+                else
+                {
+                    invalidCommand();
+                }
+                break;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	extractIntField
+    //	Description             :   This method extracts an integer field value from employee database.
+    //	Parameters				:   String(fName), Employee(eref)
+    //	Returns					:   int - value of integer field
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    public static int extractIntField(
+                                        String fName,       // Field name
+                                        Employee eref       // object of Employee class
+                                    )
+    {
+        switch(fName)
+        {
+            case "empid":
+                return eref.getEmpId();
+            case "empage":
+                return eref.getEmpAge();
+            case "empsalary":
+                return eref.getEmpSalary();
+        }
+
+        return 0;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	evaluateCondition
+    //	Description             :   This method evaluates a relational condition for integer comparison.
+    //	Parameters				:   int(fieldValue), String(operator), int(value)
+    //	Returns					:   boolean
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static boolean evaluateCondition(
+                                                int fieldValue,     // Value of field
+                                                String operator,    // Define operator
+                                                int value           // Accepted value
+                                            ) 
+    {
+        switch (operator) 
+        {
+            case "=":  
+                return fieldValue == value;
+            case "!=": 
+                return fieldValue != value;
+            case ">":  
+                return fieldValue > value;
+            case "<":  
+                return fieldValue < value;
+            case ">=": 
+                return fieldValue >= value;
+            case "<=": 
+                return fieldValue <= value;
+        }
+
+        return false;
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////

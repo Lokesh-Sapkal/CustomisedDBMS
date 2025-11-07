@@ -27,16 +27,16 @@ public class DBMSConsoleApp
                                 String A[]      // File name
                             )
     {
-        String str = null;
-        boolean exitloop = true;
-        String FileName = "employeeDB";
+        String inputCommand = null;
+        boolean isRunning = true;
+        String backupFile = "employeeDB";
 
         if(A.length != 0)
         {
-            FileName = A[0];
+            backupFile = A[0];
         }
 
-        EmployeeDBMS eobj = EmployeeDBMS.restoreBackup(FileName);
+        EmployeeDBMS eobj = EmployeeDBMS.restoreBackup(backupFile);
         
         if(eobj == null)
         {
@@ -62,16 +62,16 @@ public class DBMSConsoleApp
         System.out.println("--------------- Welcome to Customised DBMS Application ---------------");
         System.out.println("----------------------------------------------------------------------");
 
-        while(exitloop)
+        while(isRunning)
         {
             System.out.print("Employee DB > ");
-            str = sobj.nextLine();
+            inputCommand = sobj.nextLine();
 
-            str = str.trim();
-            str = str.replaceAll("\\s+"," ");
-            String tokens[] = str.split(" ");
+            inputCommand = inputCommand.trim();
+            inputCommand = inputCommand.replaceAll("\\s+"," ");
+            String tokens[] = inputCommand.split(" ");
 
-            if((tokens.length < 1) || (tokens.length > 8))
+            if(tokens.length == 0)
             {
                 System.out.println("Please give valid input.");
             }
@@ -87,7 +87,7 @@ public class DBMSConsoleApp
                             System.out.println("----------------------------------------------------------------------");
                             eobj = null;
                             System.gc();
-                            exitloop = false;
+                            isRunning = false;
                         }
                         else
                         {
@@ -129,124 +129,105 @@ public class DBMSConsoleApp
                         break;
 
                     case "select":
-                        switch(tokens.length)
+                        int fromIndex = 0;
+                        int i = 0;
+
+                        for(i = 2;i < tokens.length;i++)
                         {
-                            case 4:
-                                if((tokens[2].equalsIgnoreCase("from")) && (tokens[3].equalsIgnoreCase("Employee")))
+                            if(tokens[i].equalsIgnoreCase("from"))
+                            {
+                                fromIndex = i;
+                                break;
+                            }
+                        }
+
+                        if((fromIndex != 0) && (tokens.length >= 4) && (tokens[fromIndex+1].equalsIgnoreCase("Employee")))
+                        {
+                            String fields[] = Arrays.copyOfRange(tokens, 1, fromIndex);
+
+                            for(i = 0;i < fields.length;i++)
+                            {
+                                fields[i] = fields[i].toLowerCase();
+                            }
+
+                            if(fromIndex == (tokens.length-2))
+                            {
+                                if(fields.length == 1)
                                 {
-                                    String Field[] = new String[1];
-
-                                    Field[0] = (tokens[1]).toLowerCase();
-
-                                    if(Field[0].equals("*"))
+                                    if(fields[0].equals("*"))
                                     {
-                                        String Fields[] = {"empid","empname","empage","empaddress","empsalary"};
-                                        eobj.selectQuery(Fields);
+                                        String allFields[] = {"empid","empname","empage","empaddress","empsalary"};
+                                        eobj.selectQuery(allFields);
                                     }
-                                    else if(DBMSUtils.isValidFields(Field))
+                                    else if(DBMSUtils.isValidFields(fields))
                                     {
-                                        eobj.selectQuery(Field);
+                                        eobj.selectQuery(fields);
                                     }
                                     else
                                     {
                                         DBMSUtils.invalidCommand();
                                     }
                                 }
-                                else
+                                else if(!(DBMSUtils.isAggregateFunction(fields[0], fields[1], eobj)))
                                 {
-                                    DBMSUtils.invalidCommand();
-                                }
-                                break;
-
-                            case 5:
-                                if((tokens[3].equalsIgnoreCase("from")) && (tokens[4].equalsIgnoreCase("Employee")))
-                                {
-                                    String Fields[] = new String[2];
-
-                                    Fields[0] = (tokens[1]).toLowerCase();
-                                    Fields[1] = (tokens[2]).toLowerCase();
-
-                                    if(DBMSUtils.isValidFields(new String[] {Fields[1]}))
+                                    if(DBMSUtils.isValidFields(fields))
                                     {
-                                        if(!(DBMSUtils.isAggregateFunction(Fields[0], Fields[1], eobj)))
-                                        {
-                                            if(DBMSUtils.isValidFields(Fields))
+                                        eobj.selectQuery(fields);
+                                    }
+                                    else
+                                    {
+                                        DBMSUtils.invalidCommand();
+                                    }
+                                }
+                            }
+                            else if(tokens[fromIndex+2].equalsIgnoreCase("where") && (fromIndex == (tokens.length-6)))
+                            {
+                                if(DBMSUtils.isValidFields(new String[] {tokens[fromIndex+3].toLowerCase()}))
+                                {
+                                    if((fields.length == 1) && (fields[0].equals("*")))
+                                    {
+                                        String allFields[] = {"empid","empname","empage","empaddress","empsalary"};
+                                        fields = Arrays.copyOfRange(allFields, 0, allFields.length);
+                                    }
+
+                                    switch(tokens[fromIndex+3].toLowerCase())
+                                    {
+                                        case "empid":
+                                        case "empage":
+                                        case "empsalary":
+                                            try
                                             {
-                                                eobj.selectQuery(Fields);
+                                                DBMSUtils.checkRelationalOperator(fields,tokens[fromIndex+3],tokens[fromIndex+4],Integer.parseInt(tokens[fromIndex+5]), eobj);
                                             }
-                                            else
+                                            catch(NumberFormatException nfeobj)
                                             {
-                                                DBMSUtils.invalidCommand();
+                                                System.out.println("Exception occured.. : "+nfeobj);
                                             }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        DBMSUtils.invalidCommand();
-                                    }
-                                }
-                                else
-                                {
-                                    DBMSUtils.invalidCommand();
-                                }
-                                break;
-
-                            case 6:
-                                if((tokens[4].equalsIgnoreCase("from")) && (tokens[5].equalsIgnoreCase("Employee")))
-                                {
-                                    String Fields[] = new String[3];
-
-                                    Fields[0] = (tokens[1]).toLowerCase();
-                                    Fields[1] = (tokens[2]).toLowerCase();
-                                    Fields[2] = (tokens[3]).toLowerCase();
-
-                                    if(DBMSUtils.isValidFields(Fields))
-                                    {
-                                        eobj.selectQuery(Fields);
-                                    }
-                                    else
-                                    {
-                                        DBMSUtils.invalidCommand();
+                                            catch(Exception geobj)
+                                            {
+                                                System.out.println("Exception occured.. : "+geobj);
+                                            }
+                                            break;
+                                        case "empname":
+                                        case "empaddress":
+                                            DBMSUtils.checkRelationalOperator(fields,tokens[fromIndex+3],tokens[fromIndex+4],tokens[fromIndex+5], eobj);
+                                            break;
                                     }
                                 }
                                 else
                                 {
                                     DBMSUtils.invalidCommand();
                                 }
-                                break;
-
-                            case 7:
-                                if((tokens[5].equalsIgnoreCase("from")) && (tokens[6].equalsIgnoreCase("Employee")))
-                                {
-                                    String Fields[] = new String[4];
-
-                                    Fields[0] = (tokens[1]).toLowerCase();
-                                    Fields[1] = (tokens[2]).toLowerCase();
-                                    Fields[2] = (tokens[3]).toLowerCase();
-                                    Fields[3] = (tokens[4]).toLowerCase();
-
-                                    if(DBMSUtils.isValidFields(Fields))
-                                    {
-                                        eobj.selectQuery(Fields);
-                                    }
-                                    else
-                                    {
-                                        DBMSUtils.invalidCommand();
-                                    }
-                                }
-                                else
-                                {
-                                    DBMSUtils.invalidCommand();
-                                }
-                                break;
-
-                            // case 8:
-                            //     if((tokens[5].equalsIgnoreCase("from")) && (tokens[6].equalsIgnoreCase("Employee")))
-                            //     {
-
-                            //     break;
-                            default:
+                                
+                            }
+                            else
+                            {
                                 DBMSUtils.invalidCommand();
+                            }
+                        }
+                        else
+                        {
+                            DBMSUtils.invalidCommand();
                         }
                         break;
 
@@ -259,7 +240,7 @@ public class DBMSConsoleApp
                     case "takebackup":
                         if((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee")))
                         {
-                            eobj.takeBackup(FileName);
+                            eobj.takeBackup(backupFile);
                         }
                         else
                         {
