@@ -42,7 +42,7 @@ public class DBMSUtils
             
         for(String field : fName)
         {
-            switch(field)
+            switch(field.toLowerCase())
             {
                 case "empid","empname","empage","empaddress","empsalary":
                     break;
@@ -57,6 +57,45 @@ public class DBMSUtils
         }
 
         return isValid;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	validateValue
+    //	Description             :   This method validates the given input value based on the field.
+    //	Parameters				:   String[](field[]), String[](value[])
+    //	Returns					:   boolean
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    public static boolean validateValue(
+                                            String field[],       // field name
+                                            String value[]        // Accepted value
+                                        )
+    {
+        boolean bAns = true;
+
+        for(int i = 0;i < field.length;i++)
+        {
+            switch(field[i].toLowerCase())
+            {
+                case "empid","empage","empsalary":
+                    bAns = value[i].matches("\\d+");
+                    break;
+                case "empname","empaddress":
+                    bAns = value[i].matches("[a-zA-Z._-]+");
+                    break;
+            }
+            if(!bAns)
+            {
+                System.out.println("Error: Invalid value provided for field.");
+                System.out.println("Accepted formats:");
+                System.out.println("- EmpId, EmpAge, EmpSalary   : Only positive integers (digits 0-9)");
+                System.out.println("- EmpName, EmpAddress : Only alphabetic characters, dots(.), underscores(_), and hyphens(-)");
+                System.out.println("Please check your input and try again.\n");
+                break;
+            }
+        }
+        return bAns;
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +118,7 @@ public class DBMSUtils
         {
             case "max","min":
                 isValid = true;
-                if((fName.equals("empage")) || (fName.equals("empsalary")))
+                if((fName.equalsIgnoreCase("empage")) || (fName.equalsIgnoreCase("empsalary")))
                 {
                     if(funcName.equals("max"))
                     {
@@ -98,7 +137,7 @@ public class DBMSUtils
 
             case "sum","avg":
                 isValid = true;
-                if(fName.equals("empsalary"))
+                if(fName.equalsIgnoreCase("empsalary"))
                 {
                     eobj.calculateSumAndAverage(funcName);
                 }
@@ -127,105 +166,163 @@ public class DBMSUtils
     //////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	checkRelationalOperator
-    //	Description             :   This method checks whether the operator is valid or not and also
-    //                              call related methods.
-    //	Parameters				:   String[](fNames[]), String(fName), String(operator), T(value),
-    //                              EmployeeDBMS(eobj)
-    //	Returns					:   void
+    //	Description             :   This method checks whether the operator is valid or not.
+    //	Parameters				:   String(fName), String(operator)
+    //	Returns					:   boolean
     //
     //////////////////////////////////////////////////////////////////////////////////////////////////
-    public static <T> void checkRelationalOperator(
-                                                        String fNames[],        // Array of field name
-                                                        String fName,           // Field name
-                                                        String operator,        // Define operator
-                                                        T value,                // Value of field
-                                                        EmployeeDBMS eobj       // object of EmployeeDBMS class
-                                                    )
+    public static boolean checkRelationalOperator(
+                                                    String fName,           // Field name
+                                                    String operator         // Define operator
+                                                 )
     {
-        switch(fName)
+        boolean isValid = false;
+
+        switch(fName.toLowerCase())
         {
             case "empid","empage","empsalary":
                 switch(operator)
                 {
                     case "=","!=",">","<",">=","<=":
-                        eobj.selectSpecificIntegerRecords(fNames,fName,operator,(Integer) value);
-                        break;
-                    default:
-                        invalidCommand();
+                        isValid = true;
                         break;
                 }
                 break;
 
             case "empname","empaddress":
-                if(operator.equals("="))
+                switch(operator)
                 {
-                    eobj.selectSpecificStringRecords(fNames,fName,operator,(String) value);
-                }
-                else
-                {
-                    invalidCommand();
+                    case "=","!=":
+                        isValid = true;
+                        break;
                 }
                 break;
         }
+
+        return isValid;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	extractIntField
-    //	Description             :   This method extracts an integer field value from employee database.
+    //	Method Name			    :	extractField
+    //	Description             :   This method extracts field value.
     //	Parameters				:   String(fName), Employee(eref)
-    //	Returns					:   int - value of integer field
+    //	Returns					:   Object
     //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    public static int extractIntField(
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    public static Object extractField(
                                         String fName,       // Field name
                                         Employee eref       // object of Employee class
                                     )
     {
-        switch(fName)
+        switch(fName.toLowerCase())
         {
             case "empid":
                 return eref.getEmpId();
+            case "empname":
+                return eref.getEmpName();
             case "empage":
                 return eref.getEmpAge();
+            case "empaddress":
+                return eref.getEmpAddress();
             case "empsalary":
                 return eref.getEmpSalary();
+            default:
+                System.out.println("Invalid field access attempted : "+fName);
+                return null;
         }
-
-        return 0;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	evaluateCondition
-    //	Description             :   This method evaluates a relational condition for integer comparison.
-    //	Parameters				:   int(fieldValue), String(operator), int(value)
+    //	Description             :   This method evaluates a relational condition.
+    //	Parameters				:   String(fName), Object(fieldValue), String(operator), Object(value)
     //	Returns					:   boolean
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     public static boolean evaluateCondition(
-                                                int fieldValue,     // Value of field
-                                                String operator,    // Define operator
-                                                int value           // Accepted value
+                                                String fName,           // Field name
+                                                Object fieldValue,      // Value of field
+                                                String operator,        // Define operator
+                                                Object value            // Accepted value
                                             ) 
     {
-        switch (operator) 
+        switch(fName.toLowerCase())
         {
-            case "=":  
-                return fieldValue == value;
-            case "!=": 
-                return fieldValue != value;
-            case ">":  
-                return fieldValue > value;
-            case "<":  
-                return fieldValue < value;
-            case ">=": 
-                return fieldValue >= value;
-            case "<=": 
-                return fieldValue <= value;
+            case "empid","empage","empsalary":
+                int extractedValue = Integer.parseInt(fieldValue.toString());
+                int acceptedValue = Integer.parseInt(value.toString());
+                switch (operator) 
+                {
+                    case "=":
+                        return extractedValue == acceptedValue;
+                    case "!=": 
+                        return extractedValue != acceptedValue;
+                    case ">":  
+                        return extractedValue > acceptedValue;
+                    case "<":  
+                        return extractedValue < acceptedValue;
+                    case ">=": 
+                        return extractedValue >= acceptedValue;
+                    case "<=": 
+                        return extractedValue <= acceptedValue;
+                }
+                break;
+                
+            case "empname","empaddress":
+                String extValue = fieldValue.toString();
+                String accValue = value.toString();
+                switch (operator) 
+                {
+                    case "=":
+                        return extValue.equalsIgnoreCase(accValue);
+                    case "!=": 
+                        return !(extValue.equalsIgnoreCase(accValue));
+                }
+                break;
         }
-
         return false;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	updateRecord
+    //	Description             :   This method update employee records.
+    //	Parameters				:   Employee(eref), String[](fields[]), String[](values[])
+    //	Returns					:   NONE
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static void updateRecord(
+                                        Employee eref,
+                                        String fields[],
+                                        String values[]                                
+                                    )
+    {
+        int i = 0;
+
+        for(i = 0;i < fields.length;i++)
+        {
+            switch(fields[i])
+            {
+                case "empname":
+                    eref.setEmpName(values[i].toString());
+                    System.out.printf("Updated EmpName -> %s%n",values[i]);
+                    break;
+                case "empage":
+                    eref.setEmpAge(Integer.parseInt(values[i].toString()));
+                    System.out.printf("Updated EmpAge -> %s%n",values[i]);
+                    break;
+                case "empaddress":
+                    eref.setEmpAddress(values[i].toString());
+                    System.out.printf("Updated EmpAddress -> %s%n",values[i]);
+                    break;
+                case "empsalary":
+                    eref.setEmpSalary(Integer.parseInt(values[i].toString()));
+                    System.out.printf("Updated EmpSalary -> %s%n",values[i]);
+                    break;
+            }
+        }
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -238,15 +335,15 @@ public class DBMSUtils
     ///////////////////////////////////////////////////////////////////////////////////////////////
     public static void printSchema()
     {
-        System.out.println("+---------------+");
-        System.out.println("| Schema\t|");
-        System.out.println("+---------------+");
-        System.out.println("| empId \t|");
-        System.out.println("| empName\t|");
-        System.out.println("| empAge\t|");
-        System.out.println("| empAddress\t|");
-        System.out.println("| empSalary\t|");
-        System.out.println("+---------------+");
+        System.out.println("+---------------+---------------+");
+        System.out.println("| Schema\t| Datatype\t|");
+        System.out.println("+---------------+---------------+");
+        System.out.println("| empId \t| INT   \t|");
+        System.out.println("| empName\t| STRING\t|");
+        System.out.println("| empAge\t| INT   \t|");
+        System.out.println("| empAddress\t| STRING\t|");
+        System.out.println("| empSalary\t| INT   \t|");
+        System.out.println("+---------------+---------------+");
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -320,19 +417,14 @@ public class DBMSUtils
                                                     int widths[]        // Array of widths
                                                 )
     {
-        StringBuilder border = new StringBuilder("+");
-        for (int width : widths) 
-        {
-            border.append("-".repeat(width + 2)).append("+");
-        }
-        System.out.println(border);
+        System.out.println(createBorder(widths));
         System.out.print("|");
         for (int i = 0; i < headers.length; i++) 
         {
             System.out.printf(" %-" + widths[i] + "s |", headers[i]);
         }
         System.out.println();
-        System.out.println(border);
+        System.out.println(createBorder(widths));
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -428,12 +520,7 @@ public class DBMSUtils
         }
         System.out.println();
 
-        StringBuilder border = new StringBuilder("+");
-        for (int width : widths) 
-        {
-            border.append("-".repeat(width + 2)).append("+");
-        }
-        System.out.println(border);
+        System.out.println(createBorder(widths));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -459,25 +546,117 @@ public class DBMSUtils
         {
             System.out.printf("| %-" + width + args + " |%n", value);
         }
-        
+
+        System.out.println(createBorder(new int[] {width}));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	createBorder
+    //	Description             :   This method creates employee table border.
+    //	Parameters				:   int[](width[])
+    //	Returns					:   StringBuilder(border)
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    public static StringBuilder createBorder(
+                                                int widths[]       // Array of width of record                                 
+                                            )
+    {
         StringBuilder border = new StringBuilder("+");
+        for (int width : widths) 
+        {
+            border.append("-".repeat(width + 2)).append("+");
+        }
 
-        border.append("-".repeat(width + 2)).append("+");
+        return border;
+    }
 
-        System.out.println(border);
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	displayHelp
+    //	Description             :   This method displays the list of all supported DBMS commands.
+    //	Parameters				:   NONE
+    //	Returns					:   NONE
+    //
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    public static void displayHelp()
+    {
+        String line = "-".repeat(80);
+        System.out.println(line);
+        System.out.println("                         Customised DBMS - HELP");
+        System.out.println(line);
+
+        System.out.println("\n1) Describe schema");
+        System.out.println("   ----------------");
+        System.out.println("   describe Employee\n");
+
+        System.out.println("2) Insert record");
+        System.out.println("   -------------");
+        System.out.println("   insert into Employee values <EmpName> <EmpAge> <EmpAddress> <EmpSalary>");
+        System.out.println("   (EmpId is auto-incremented and unique)\n");
+
+        System.out.println("3) Select records");
+        System.out.println("   --------------");
+        System.out.println("   - All fields:");
+        System.out.println("       select * from Employee\n");
+        System.out.println("   - Specific fields:");
+        System.out.println("       select empname empsalary from Employee\n");
+        System.out.println("   - With WHERE clause:");
+        System.out.println("       select * from Employee where <field> <operator> <value>");
+        System.out.println("       select empname empsalary from Employee where empsalary >= 40000");
+        System.out.println("     Supported operators:");
+        System.out.println("       For numeric fields (empid, empage, empsalary): =, !=, <, >, <=, >=");
+        System.out.println("       For string fields (empname, empaddress): =, !=\n");
+
+        System.out.println("4) Aggregate functions");
+        System.out.println("   -------------------");
+        System.out.println("   select max empsalary from Employee");
+        System.out.println("   select min empage from Employee");
+        System.out.println("   select sum empsalary from Employee");
+        System.out.println("   select avg empsalary from Employee");
+        System.out.println("   select count empid from Employee\n");
+
+        System.out.println("5) Update records");
+        System.out.println("   --------------");
+        System.out.println("   - Update all records:");
+        System.out.println("       update Employee set empaddress = Mumbai\n");
+        System.out.println("   - Update with WHERE clause:");
+        System.out.println("       update Employee set empsalary = 70000 where empname = Radha");
+        System.out.println("   Note: empid cannot be updated.\n");
+
+        System.out.println("6) Delete records (not implemented)");
+        System.out.println("   -------------------------------");
+        System.out.println("   (Planned: delete from Employee where <field> <operator> <value>)\n");
+
+        System.out.println("7) Backup / Restore");
+        System.out.println("   -----------------");
+        System.out.println("   takebackup Employee    (creates backup file: data/backups/<name>.ser)");
+        System.out.println("   (Restore is automatic at program start if the .ser file exists)\n");
+
+        System.out.println("8) Exit");
+        System.out.println("   ----");
+        System.out.println("   exit");
+        System.out.println("   exit Employee\n");
+
+        System.out.println("9) Help");
+        System.out.println("   ----");
+        System.out.println("   help\n");
+
+        System.out.println(line);
     }
  
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	invalidCommand
-    //	Description             :   This method display error message if command mismatched.
+    //	Description             :   Displays error message and points user to help.
     //	Parameters				:   NONE
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
     public static void invalidCommand()
     {
-        System.out.println("Command not found");
-        System.out.println("Please give valid command.");
+        System.out.println("Command not found.");
+        System.out.println("Type 'help' to see the list of available commands.");
+        System.out.println("Common commands: describe, insert, select, update, takebackup, exit, help\n");
     }
 }

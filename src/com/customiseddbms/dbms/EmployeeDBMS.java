@@ -67,21 +67,27 @@ public class EmployeeDBMS implements Serializable
 
         table.add(eobj);
 
-        System.out.println("New Record inserted successfully");
+        System.out.println("New Record inserted successfully.\n");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	selectQuery
+    //	Method Name			    :	selectRecords
     //	Description             :   This method display employee records from the database.
     //	Parameters				:   String[] (fNames[])
     //	Returns					:   NONE
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    public void selectQuery(
+    public void selectRecords(
                                 String fNames[]    // Array of field name
-                            )
+                             )
     {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
         DBMSUtils.printEmployeeTableHeader(fNames);
 
         for(Employee eref : table)
@@ -92,26 +98,32 @@ public class EmployeeDBMS implements Serializable
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //	Method Name			    :	selectSpecificIntegerRecords
-    //	Description             :   This method display specific integer employee records from the database.
-    //	Parameters				:   String[](fNames[]), String(fName), String(operator), int(Value)
+    //	Method Name			    :	selectSpecificRecords
+    //	Description             :   This method display specific employee records from the database.
+    //	Parameters				:   String[](fNames[]), String(fName), String(operator), Object(Value)
     //	Returns					:   NONE
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void selectSpecificIntegerRecords(
-                                                String fNames[],        // Array of field name
-                                                String fName,           // Field name
-                                                String operator,        // Define operator
-                                                int value               // Value of field
-                                            )
+    public void selectSpecificRecords(
+                                        String fNames[],        // Array of field name
+                                        String fName,           // Field name
+                                        String operator,        // Define operator
+                                        Object value            // Value of field
+                                    )
     {
-        DBMSUtils.printEmployeeTableHeader(fNames);
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
         boolean bFound = false;
+        DBMSUtils.printEmployeeTableHeader(fNames);
 
         for (Employee eref : table) 
         {
-            int fieldValue = DBMSUtils.extractIntField(fName, eref);
-            if(DBMSUtils.evaluateCondition(fieldValue, operator, value)) 
+            Object fieldValue = DBMSUtils.extractField(fName, eref);
+            if(DBMSUtils.evaluateCondition(fName, fieldValue, operator, value)) 
             {
                 bFound = true;
                 DBMSUtils.printEmployeeRecord(eref, fNames);
@@ -120,56 +132,7 @@ public class EmployeeDBMS implements Serializable
 
         if(!bFound)
         {
-            System.out.println("Record not found");
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //	Method Name			    :	selectSpecificStringRecords
-    //	Description             :   This method display specific string employee records from the database.
-    //	Parameters				:   String[](fNames[]), String(fName), String(operator), String(Value)
-    //	Returns					:   NONE
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void selectSpecificStringRecords(
-                                                String fNames[],        // Array of field name
-                                                String fName,           // Field name
-                                                String operator,        // Define operator
-                                                String value            // Value of field
-                                            )
-    {
-        DBMSUtils.printEmployeeTableHeader(fNames);
-        boolean bFound = false;
-
-        switch(fName)
-        {
-            case "empname":
-                for(Employee eref : table)
-                {
-                    if(eref.getEmpName().equalsIgnoreCase(value))
-                    {
-                        bFound = true;
-                        DBMSUtils.printEmployeeRecord(eref,fNames);
-                    }
-                }
-                break;
-
-            case "empaddress":
-                for(Employee eref : table)
-                {
-                    if(eref.getEmpAddress().equalsIgnoreCase(value))
-                    {
-                        bFound = true;
-                        DBMSUtils.printEmployeeRecord(eref,fNames);
-                    }
-                }
-                break;
-        }
-
-        if(!bFound)
-        {
-            System.out.println("Record not found");
+            System.out.println("Record not found.\n");
         }
     }
 
@@ -185,49 +148,33 @@ public class EmployeeDBMS implements Serializable
                                         String field    // Define the field
                                     )
     {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
         DBMSUtils.printEmployeeTableHeader(new String[] {field});
 
-        int iMax = 0;
-        boolean bFound = false;
+        int iMax = Integer.MIN_VALUE;
+        int extractedValue = 0;
+
+        for(Employee eref : table)
+        {
+            extractedValue = Integer.parseInt(DBMSUtils.extractField(field,eref).toString());
+            if(iMax < extractedValue)
+            {
+                iMax = extractedValue;
+            }
+        }
 
         switch(field)
         {
             case "empage":
-                for(Employee eref : table)
-                {
-                    if(iMax < eref.getEmpAge())
-                    {
-                        bFound = true;
-                        iMax = eref.getEmpAge();
-                    }
-                }
-                if(bFound)
-                {
-                    DBMSUtils.printRecord(iMax,6,'d');
-                }
-                else
-                {
-                    System.out.println("Record not found");
-                }
+                DBMSUtils.printRecord(iMax,6,'d');
                 break;
-            
             case "empsalary":
-                for(Employee eref : table)
-                {
-                    if(iMax < eref.getEmpSalary())
-                    {
-                        bFound = true;
-                        iMax = eref.getEmpSalary();
-                    }      
-                }
-                if(bFound)
-                {
-                    DBMSUtils.printRecord(iMax,10,'d');
-                }
-                else
-                {
-                    System.out.println("Record not found");
-                }
+                DBMSUtils.printRecord(iMax,10,'d');
                 break;
         }
     }
@@ -244,49 +191,33 @@ public class EmployeeDBMS implements Serializable
                                         String field    // Define the field
                                     )
     {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
         DBMSUtils.printEmployeeTableHeader(new String[] {field});
 
         int iMin = Integer.MAX_VALUE;
-        boolean bFound = false;
+        int extractedValue = 0;
+
+        for(Employee eref : table)
+        {
+            extractedValue = Integer.parseInt(DBMSUtils.extractField(field,eref).toString());
+            if(iMin > extractedValue)
+            {
+                iMin = extractedValue;
+            }
+        }
 
         switch(field)
         {
             case "empage":
-                for(Employee eref : table)
-                {
-                    if(iMin > eref.getEmpAge())
-                    {
-                        bFound = true;
-                        iMin = eref.getEmpAge();
-                    }
-                }
-                if(bFound)
-                {
-                    DBMSUtils.printRecord(iMin,6,'d');
-                }
-                else
-                {
-                    System.out.println("Record not found");
-                }
+                DBMSUtils.printRecord(iMin,6,'d');
                 break;
-            
             case "empsalary":
-                for(Employee eref : table)
-                {
-                    if(iMin > eref.getEmpSalary())
-                    {
-                        bFound = true;
-                        iMin = eref.getEmpSalary();
-                    }
-                }
-                if(bFound)
-                {
-                    DBMSUtils.printRecord(iMin,10,'d');
-                }
-                else
-                {
-                    System.out.println("Record not found");
-                }
+                DBMSUtils.printRecord(iMin,10,'d');
                 break;
         }
     }
@@ -303,6 +234,12 @@ public class EmployeeDBMS implements Serializable
                                             String fName    // Define the function
                                         )
     {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
         long lSum = 0L;
 
         for(Employee eref : table)
@@ -310,7 +247,7 @@ public class EmployeeDBMS implements Serializable
             lSum += eref.getEmpSalary();
         }
 
-        if((fName.equals("avg")) && (table.size() != 0))
+        if(fName.equals("avg"))
         {
             double dAvg = (double)lSum/table.size();
 
@@ -327,15 +264,103 @@ public class EmployeeDBMS implements Serializable
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	countRecords
-    //	Description             :   This method Count employee database records.
+    //	Description             :   This method count employee database records.
     //	Parameters				:   NONE
     //	Returns					:   NONE
     //
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     public void countRecords()
     {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
         DBMSUtils.printEmployeeTableHeader(new String[] {"count"});
         DBMSUtils.printRecord(table.size(),10,'d');
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	updateRecords
+    //	Description             :   This method update employee records from the database.
+    //	Parameters				:   String[](fNames[]), String[](fValues[])
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    public void updateRecords(
+                                String fNames[],    // Array of field name
+                                String fValues[]    // Array of accepted value
+                             )
+    {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
+        int countRows = 0;
+
+        for(Employee eref : table)
+        {
+            countRows++;
+            DBMSUtils.updateRecord(eref,fNames,fValues);
+        }
+
+        if(countRows != 0)
+        {
+            System.out.printf("Record updated successfully. %d row(s) affected.\n\n",countRows);   
+        }
+        else
+        {
+            System.out.println("Record not found. Update failed.\n");
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	updateSpecificRecords
+    //	Description             :   This method update specific employee records from the database.
+    //	Parameters				:   String[](fNames[]), String[](fValues[]), String(fName), String(operator), 
+    //                              Object(value)
+    //	Returns					:   NONE
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void updateSpecificRecords(
+                                        String fNames[],        // Array of field name
+                                        String fValues[],       // Array of accepted value
+                                        String fName,           // Field name
+                                        String operator,        // Define operator
+                                        Object value            // Value of field
+                                     )
+    {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
+        int countRows = 0;
+
+        for (Employee eref : table) 
+        {
+            Object fieldValue = DBMSUtils.extractField(fName, eref);
+            if(DBMSUtils.evaluateCondition(fName, fieldValue, operator, value)) 
+            {
+                countRows++;
+                DBMSUtils.updateRecord(eref,fNames,fValues);
+            }
+        }
+
+        if(countRows != 0)
+        {
+            System.out.printf("Record updated successfully. %d row(s) affected.\n\n",countRows);   
+        }
+        else
+        {
+            System.out.println("Record not found. Update failed.\n");
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -346,7 +371,7 @@ public class EmployeeDBMS implements Serializable
     //	Returns					:   NONE
     //
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    public void takeBackup(
+    public void takeBackup( 
                                 String fName    // File name
                             )
     {
@@ -368,12 +393,12 @@ public class EmployeeDBMS implements Serializable
             oos.close();
             fos.close();
             
-            System.out.println("The class object could be written to a file.");
+            System.out.printf("Backup created successfully in %s.ser file.\n\n",fName);
         }
         catch(Exception eobj)
         {
             System.out.println("The class object could not be written to the file.");
-            System.out.println("Error : "+eobj);
+            System.out.println("Error : "+eobj+"\n");
         }
     }
 

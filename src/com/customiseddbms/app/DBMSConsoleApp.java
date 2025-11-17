@@ -71,154 +71,210 @@ public class DBMSConsoleApp
             inputCommand = inputCommand.replaceAll("\\s+"," ");
             String tokens[] = inputCommand.split(" ");
 
-            if(tokens.length == 0)
+            switch((tokens[0]).toLowerCase())
             {
-                System.out.println("Please give valid input.");
-            }
-            else
-            {
-                switch((tokens[0]).toLowerCase())
-                {
-                    case "exit":
-                        if((tokens.length == 1) || ((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee"))))
-                        {
-                            System.out.println("----------------------------------------------------------------------");
-                            System.out.println("---------- Thank You for using Customised DBMS Application -----------");
-                            System.out.println("----------------------------------------------------------------------");
-                            eobj = null;
-                            System.gc();
-                            isRunning = false;
-                        }
-                        else
-                        {
-                            DBMSUtils.invalidCommand();
-                        }
-                        break;
+                case "help":
+                    if(tokens.length == 1)
+                    {
+                        DBMSUtils.displayHelp();
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
 
-                    case "describe":
-                        if((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee")))
-                        {
-                            DBMSUtils.printSchema();
-                        }
-                        else
-                        {
-                            DBMSUtils.invalidCommand();
-                        }
-                        break;
+                case "describe":
+                    if((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee")))
+                    {
+                        DBMSUtils.printSchema();
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
 
-                    case "insert":
-                        try
+                case "insert":
+                    if((tokens.length == 8) && (tokens[1].equalsIgnoreCase("into")) && (tokens[2].equalsIgnoreCase("Employee")) && (tokens[3].equalsIgnoreCase("Values")))
+                    {
+                        if(DBMSUtils.validateValue(new String[] {"empname","empage","empaddress","empsalary"},new String[] {tokens[4],tokens[5],tokens[6],tokens[7]}))
                         {
-                            if((tokens.length == 8) && (tokens[1].equalsIgnoreCase("into")) && (tokens[2].equalsIgnoreCase("Employee")) && (tokens[3].equalsIgnoreCase("Values")))
+                            int age = Integer.parseInt(tokens[5]);
+                            int salary = Integer.parseInt(tokens[7]);
+                            if(age < 15)
                             {
-                                eobj.insertQuery(tokens[4],Integer.parseInt(tokens[5]),tokens[6],Integer.parseInt(tokens[7]));
+                                System.out.println("Invalid EmpAge. Age must be 15 or above.\n");
                             }
                             else
                             {
-                                DBMSUtils.invalidCommand();
+                                eobj.insertQuery(tokens[4],age,tokens[6],salary);
                             }
                         }
-                        catch(NumberFormatException nfeobj)
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
+
+                case "select":
+                    int fromIndex = 0;
+                    int i = 0;
+
+                    for(i = 2;i < (tokens.length-1);i++)
+                    {
+                        if(tokens[i].equalsIgnoreCase("from"))
                         {
-                            System.out.println("Exception occured.. : "+nfeobj);
+                            fromIndex = i;
+                            break;
                         }
-                        catch(Exception geobj)
-                        {
-                            System.out.println("Exception occured.. : "+geobj);
-                        }
-                        break;
+                    }
 
-                    case "select":
-                        int fromIndex = 0;
-                        int i = 0;
+                    if((fromIndex != 0) && (tokens.length > fromIndex+1) && (tokens[fromIndex+1].equalsIgnoreCase("Employee")))
+                    {
+                        String fields[] = Arrays.copyOfRange(tokens, 1, fromIndex);
 
-                        for(i = 2;i < tokens.length;i++)
+                        for(i = 0;i < fields.length;i++)
                         {
-                            if(tokens[i].equalsIgnoreCase("from"))
-                            {
-                                fromIndex = i;
-                                break;
-                            }
+                            fields[i] = fields[i].toLowerCase();
                         }
 
-                        if((fromIndex != 0) && (tokens.length >= 4) && (tokens[fromIndex+1].equalsIgnoreCase("Employee")))
+                        if(fromIndex == (tokens.length-2))
                         {
-                            String fields[] = Arrays.copyOfRange(tokens, 1, fromIndex);
-
-                            for(i = 0;i < fields.length;i++)
+                            if(fields.length == 1)
                             {
-                                fields[i] = fields[i].toLowerCase();
-                            }
-
-                            if(fromIndex == (tokens.length-2))
-                            {
-                                if(fields.length == 1)
+                                if(fields[0].equals("*"))
                                 {
-                                    if(fields[0].equals("*"))
-                                    {
-                                        String allFields[] = {"empid","empname","empage","empaddress","empsalary"};
-                                        eobj.selectQuery(allFields);
-                                    }
-                                    else if(DBMSUtils.isValidFields(fields))
-                                    {
-                                        eobj.selectQuery(fields);
-                                    }
-                                    else
-                                    {
-                                        DBMSUtils.invalidCommand();
-                                    }
+                                    String allFields[] = {"empid","empname","empage","empaddress","empsalary"};
+                                    eobj.selectRecords(allFields);
                                 }
-                                else if(!(DBMSUtils.isAggregateFunction(fields[0], fields[1], eobj)))
+                                else if(DBMSUtils.isValidFields(fields))
                                 {
-                                    if(DBMSUtils.isValidFields(fields))
-                                    {
-                                        eobj.selectQuery(fields);
-                                    }
-                                    else
-                                    {
-                                        DBMSUtils.invalidCommand();
-                                    }
+                                    eobj.selectRecords(fields);
+                                }
+                                else
+                                {
+                                    DBMSUtils.invalidCommand();
                                 }
                             }
-                            else if(tokens[fromIndex+2].equalsIgnoreCase("where") && (fromIndex == (tokens.length-6)))
+                            else if(!(DBMSUtils.isAggregateFunction(fields[0], fields[1], eobj)))
                             {
-                                if(DBMSUtils.isValidFields(new String[] {tokens[fromIndex+3].toLowerCase()}))
+                                if(DBMSUtils.isValidFields(fields))
                                 {
-                                    if((fields.length == 1) && (fields[0].equals("*")))
-                                    {
-                                        String allFields[] = {"empid","empname","empage","empaddress","empsalary"};
-                                        fields = Arrays.copyOfRange(allFields, 0, allFields.length);
-                                    }
+                                    eobj.selectRecords(fields);
+                                }
+                                else
+                                {
+                                    DBMSUtils.invalidCommand();
+                                }
+                            }
+                        }
+                        else if((fromIndex == (tokens.length-6)) && (tokens[fromIndex+2].equalsIgnoreCase("where")))
+                        {
+                            if(DBMSUtils.isValidFields(new String[] {tokens[fromIndex+3].toLowerCase()}))
+                            {
+                                if((fields.length == 1) && (fields[0].equals("*")))
+                                {
+                                    String allFields[] = {"empid","empname","empage","empaddress","empsalary"};
+                                    fields = Arrays.copyOfRange(allFields, 0, allFields.length);
+                                }
 
-                                    switch(tokens[fromIndex+3].toLowerCase())
+                                if(DBMSUtils.checkRelationalOperator(tokens[fromIndex+3],tokens[fromIndex+4]) && (DBMSUtils.isValidFields(fields)))
+                                {
+                                    if(DBMSUtils.validateValue(new String[] {tokens[fromIndex+3]},new String[] {tokens[fromIndex+5]}))
                                     {
-                                        case "empid":
-                                        case "empage":
-                                        case "empsalary":
-                                            try
-                                            {
-                                                DBMSUtils.checkRelationalOperator(fields,tokens[fromIndex+3],tokens[fromIndex+4],Integer.parseInt(tokens[fromIndex+5]), eobj);
-                                            }
-                                            catch(NumberFormatException nfeobj)
-                                            {
-                                                System.out.println("Exception occured.. : "+nfeobj);
-                                            }
-                                            catch(Exception geobj)
-                                            {
-                                                System.out.println("Exception occured.. : "+geobj);
-                                            }
-                                            break;
-                                        case "empname":
-                                        case "empaddress":
-                                            DBMSUtils.checkRelationalOperator(fields,tokens[fromIndex+3],tokens[fromIndex+4],tokens[fromIndex+5], eobj);
-                                            break;
+                                        eobj.selectSpecificRecords(fields,tokens[fromIndex+3],tokens[fromIndex+4],(tokens[fromIndex+5]));
                                     }
                                 }
                                 else
                                 {
                                     DBMSUtils.invalidCommand();
                                 }
-                                
+                            }
+                            else
+                            {
+                                DBMSUtils.invalidCommand();
+                            }
+                            
+                        }
+                        else
+                        {
+                            DBMSUtils.invalidCommand();
+                        }
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
+
+                case "update":
+                    if(tokens.length >= 6)
+                    {
+                        if((tokens[1].equalsIgnoreCase("Employee")) && (tokens[2].equalsIgnoreCase("set")))
+                        {
+                            int j = 0;
+                            int whereIndex = -1;
+                            int countEqual = 0;
+                            String fields[];
+                            String fValues[];
+
+                            for(i = 3;i < tokens.length;i++)
+                            {
+                                if(tokens[i].equals("="))
+                                {
+                                    countEqual++;
+                                }
+                                else if(tokens[i].equalsIgnoreCase("where"))
+                                {
+                                    whereIndex = i;
+                                    break;
+                                }
+                            }
+
+                            fields = new String[countEqual];
+                            fValues = new String[countEqual];
+
+                            for(i = 3,j = 0;(i < tokens.length-1) && (i != whereIndex) && (j < countEqual);i++)
+                            {
+                                if(tokens[i].equals("="))
+                                {
+                                    fields[j] = tokens[i-1].toLowerCase();
+                                    fValues[j] = tokens[i+1];
+                                    j++;
+                                }
+                            }
+
+                            if(Arrays.asList(fields).contains("empid"))
+                            {
+                                System.out.println("Employee ID is unique for each record and cannot be updated.\n");
+                                if(fields.length == 1)
+                                {
+                                    break;
+                                }
+                            }
+
+                            if(DBMSUtils.isValidFields(fields))
+                            {
+                                if(DBMSUtils.validateValue(fields,fValues))
+                                {
+                                    if(whereIndex == -1)
+                                    {
+                                        eobj.updateRecords(fields,fValues);
+                                    }
+                                    else if((whereIndex == tokens.length-4) && (DBMSUtils.checkRelationalOperator(tokens[whereIndex+1],tokens[whereIndex+2])))
+                                    {
+                                        if(DBMSUtils.validateValue(new String[] {tokens[whereIndex+1]},new String[] {tokens[whereIndex+3]}))
+                                        {
+                                            eobj.updateSpecificRecords(fields,fValues,tokens[whereIndex+1],tokens[whereIndex+2],tokens[whereIndex+3]);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        DBMSUtils.invalidCommand();
+                                    }
+                                }
                             }
                             else
                             {
@@ -229,30 +285,45 @@ public class DBMSConsoleApp
                         {
                             DBMSUtils.invalidCommand();
                         }
-                        break;
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
 
-                    // case "update":
-                    //     break;
+                // case "delete":
+                //     break;
 
-                    // case "delete":
-                    //     break;
+                case "takebackup":
+                    if((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee")))
+                    {
+                        eobj.takeBackup(backupFile);
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
 
-                    case "takebackup":
-                        if((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee")))
-                        {
-                            eobj.takeBackup(backupFile);
-                        }
-                        else
-                        {
-                            DBMSUtils.invalidCommand();
-                        }
-                        break;
+                case "exit":
+                    if((tokens.length == 1) || ((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee"))))
+                    {
+                        System.out.println("----------------------------------------------------------------------");
+                        System.out.println("---------- Thank You for using Customised DBMS Application -----------");
+                        System.out.println("----------------------------------------------------------------------");
+                        sobj.close();
+                        isRunning = false;
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
 
-                    default :
-                        System.out.println("Please give valid input.");
-                }   // End of switch case
-
-            }   // End of else
+                default :
+                    System.out.println("Please give valid input.\n");
+            }   // End of switch case
 
         }   // End of while loop
 
