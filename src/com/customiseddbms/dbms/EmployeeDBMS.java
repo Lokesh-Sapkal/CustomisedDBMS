@@ -284,7 +284,7 @@ public class EmployeeDBMS implements Serializable
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	updateRecords
-    //	Description             :   This method update employee records from the database.
+    //	Description             :   This method update employee records from the employee database.
     //	Parameters				:   String[](fNames[]), String[](fValues[])
     //	Returns					:   NONE
     //
@@ -321,7 +321,7 @@ public class EmployeeDBMS implements Serializable
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //	Method Name			    :	updateSpecificRecords
-    //	Description             :   This method update specific employee records from the database.
+    //	Description             :   This method update specific employee records from the employee database.
     //	Parameters				:   String[](fNames[]), String[](fValues[]), String(fName), String(operator), 
     //                              Object(value)
     //	Returns					:   NONE
@@ -360,6 +360,101 @@ public class EmployeeDBMS implements Serializable
         else
         {
             System.out.println("Record not found. Update failed.\n");
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	deleteRecords
+    //	Description             :   This method delete employee records from the employee database.
+    //	Parameters				:   NONE
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    public void deleteRecords()
+    {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
+        int countRows = table.size();
+        table.clear();
+
+        System.out.printf("Record deleted successfully. %d row(s) affected.\n\n",countRows);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	deleteSpecificRecords
+    //	Description             :   This method delete specific employee records from the employee database.
+    //	Parameters				:   String(fName), String(operator), Object(value)
+    //	Returns					:   NONE
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void deleteSpecificRecords(
+                                        String fName,           // Field name
+                                        String operator,        // Define operator
+                                        Object value            // Value of field
+                                     )
+    {
+        if(table.isEmpty())
+        {
+            System.out.println("The database is currently empty.\n");
+            return;
+        }
+
+        int i = 0;
+        int countRows = 0;
+
+        for(i = 0;i < table.size();i++)
+        {
+            Employee eref = table.get(i);
+            Object fieldValue = DBMSUtils.extractField(fName, eref);
+            if(DBMSUtils.evaluateCondition(fName, fieldValue, operator, value))
+            {
+                table.remove(i);
+                countRows++;
+                i--;
+            }
+        }
+
+        if(countRows != 0)
+        {
+            System.out.printf("Record deleted successfully. %d row(s) affected.\n\n",countRows);   
+        }
+        else
+        {
+            System.out.println("Record not found. Delete failed.\n");
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //	Method Name			    :	dropTable
+    //	Description             :   This method delete the employee database.
+    //	Parameters				:   String(fName)
+    //	Returns					:   NONE
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    public void dropTable(
+                             String fName    // File name
+                         )
+    {
+        String fPath = FILE_PATH+fName+".ser";
+
+        File f = new File(fPath);
+
+        if(f.delete())
+        {
+            table.clear();
+            Employee.iCounter = 1;
+            System.out.printf("%s.ser file deleted successfully\n\n",fName);
+        }
+        else
+        {
+            System.out.println("File not found or couldn't be deleted\n");
         }
     }
 

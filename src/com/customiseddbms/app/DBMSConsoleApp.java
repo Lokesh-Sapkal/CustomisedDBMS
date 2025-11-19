@@ -30,6 +30,9 @@ public class DBMSConsoleApp
         String inputCommand = null;
         boolean isRunning = true;
         String backupFile = "employeeDB";
+        String option = null;
+
+        Scanner sobj = new Scanner(System.in);
 
         if(A.length != 0)
         {
@@ -40,6 +43,15 @@ public class DBMSConsoleApp
         
         if(eobj == null)
         {
+            System.out.println("Enter the new backup file name : ");
+            System.out.println("(or leave blank if you don't want to rename the backup file.)");
+            System.out.println("(By default it will accept from command line arguments.)");
+            option = sobj.nextLine();
+            
+            if(!option.equals(""))
+            {
+                backupFile = option;
+            }
             eobj = new EmployeeDBMS();
         }
         else
@@ -55,8 +67,6 @@ public class DBMSConsoleApp
             }
             Employee.iCounter = ++iMax;
         }
-
-        Scanner sobj = new Scanner(System.in);
 
         System.out.println("----------------------------------------------------------------------");
         System.out.println("--------------- Welcome to Customised DBMS Application ---------------");
@@ -261,7 +271,17 @@ public class DBMSConsoleApp
                                 {
                                     if(whereIndex == -1)
                                     {
-                                        eobj.updateRecords(fields,fValues);
+                                        System.out.println("Do you want to update all records?");
+                                        option = sobj.nextLine();
+                            
+                                        if(option.equalsIgnoreCase("yes"))
+                                        {
+                                            eobj.updateRecords(fields,fValues);
+                                        }
+                                        else
+                                        {
+                                            System.out.println("Update cancelled.");
+                                        }
                                     }
                                     else if((whereIndex == tokens.length-4) && (DBMSUtils.checkRelationalOperator(tokens[whereIndex+1],tokens[whereIndex+2])))
                                     {
@@ -292,8 +312,51 @@ public class DBMSConsoleApp
                     }
                     break;
 
-                // case "delete":
-                //     break;
+                case "delete":
+                    if((tokens.length >= 3) && (tokens[1].equalsIgnoreCase("from")) && (tokens[2].equalsIgnoreCase("Employee")))
+                    {
+                        if(tokens.length == 3)
+                        {
+                            System.out.println("Do you want to delete all records?");
+                            option = sobj.nextLine();
+                
+                            if(option.equalsIgnoreCase("yes"))
+                            {
+                                eobj.deleteRecords();
+                            }
+                            else
+                            {
+                                System.out.println("delete cancelled.");
+                            }
+                        }
+                        else if((tokens.length == 7) && (tokens[3].equalsIgnoreCase("where")) && (DBMSUtils.checkRelationalOperator(tokens[4],tokens[5])))
+                        {
+                            if(DBMSUtils.validateValue(new String[] {tokens[4]},new String[] {tokens[6]}))
+                            {
+                                eobj.deleteSpecificRecords(tokens[4],tokens[5],tokens[6]);
+                            }
+                        }
+                        else
+                        {
+                            DBMSUtils.invalidCommand();
+                        }
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
+
+                case "drop":
+                    if((tokens.length == 3) && (tokens[1].equalsIgnoreCase("table")) && (tokens[2].equalsIgnoreCase("Employee")))
+                    {
+                        eobj.dropTable(backupFile);
+                    }
+                    else
+                    {
+                        DBMSUtils.invalidCommand();
+                    }
+                    break;
 
                 case "takebackup":
                     if((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee")))
@@ -309,6 +372,15 @@ public class DBMSConsoleApp
                 case "exit":
                     if((tokens.length == 1) || ((tokens.length == 2) && (tokens[1].equalsIgnoreCase("Employee"))))
                     {
+                        System.out.println("Make sure to back up before exiting.");
+                        System.out.println("Do you want to make a backup?");
+                        option = sobj.nextLine();
+            
+                        if(option.equalsIgnoreCase("yes"))
+                        {
+                            eobj.takeBackup(backupFile);
+                        }
+
                         System.out.println("----------------------------------------------------------------------");
                         System.out.println("---------- Thank You for using Customised DBMS Application -----------");
                         System.out.println("----------------------------------------------------------------------");

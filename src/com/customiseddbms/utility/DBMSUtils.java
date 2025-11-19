@@ -131,7 +131,7 @@ public class DBMSUtils
                 }
                 else
                 {
-                    invalidCommand();
+                    System.out.printf("Error: Aggregate function '%s' not applicable on field '%s'.\n\n",funcName,fName);
                 }
                 break;
 
@@ -143,7 +143,7 @@ public class DBMSUtils
                 }
                 else
                 {
-                    invalidCommand();
+                    System.out.printf("Error: Aggregate function '%s' not applicable on field '%s'.\n\n",funcName,fName);
                 }
                 break;
 
@@ -155,7 +155,7 @@ public class DBMSUtils
                 }
                 else
                 {
-                    invalidCommand();
+                    System.out.printf("Error: Aggregate function '%s' not applicable on field '%s'.\n\n",funcName,fName);
                 }
                 break;
         }
@@ -303,7 +303,7 @@ public class DBMSUtils
 
         for(i = 0;i < fields.length;i++)
         {
-            switch(fields[i])
+            switch(fields[i].toLowerCase())
             {
                 case "empname":
                     eref.setEmpName(values[i].toString());
@@ -624,21 +624,28 @@ public class DBMSUtils
         System.out.println("       update Employee set empsalary = 70000 where empname = Radha");
         System.out.println("   Note: empid cannot be updated.\n");
 
-        System.out.println("6) Delete records (not implemented)");
-        System.out.println("   -------------------------------");
-        System.out.println("   (Planned: delete from Employee where <field> <operator> <value>)\n");
+        System.out.println("6) Delete records");
+        System.out.println("   --------------");
+        System.out.println("   - Delete all records:");
+        System.out.println("       delete from Employee");
+        System.out.println("   - Delete with WHERE clause:");
+        System.out.println("       delete from Employee where <field> <operator> <value>\n");
 
-        System.out.println("7) Backup / Restore");
+        System.out.println("7) Drop table");
+        System.out.println("   ----------");
+        System.out.println("   drop table Employee\n");
+
+        System.out.println("8) Backup / Restore");
         System.out.println("   -----------------");
         System.out.println("   takebackup Employee    (creates backup file: data/backups/<name>.ser)");
         System.out.println("   (Restore is automatic at program start if the .ser file exists)\n");
 
-        System.out.println("8) Exit");
+        System.out.println("9) Exit");
         System.out.println("   ----");
         System.out.println("   exit");
         System.out.println("   exit Employee\n");
 
-        System.out.println("9) Help");
+        System.out.println("10) Help");
         System.out.println("   ----");
         System.out.println("   help\n");
 
